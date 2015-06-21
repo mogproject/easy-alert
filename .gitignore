@@ -55,3 +55,10 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# Mac
+.DS_Store
