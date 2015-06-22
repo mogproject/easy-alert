@@ -9,8 +9,8 @@ Super Simple Process Monitoring Tool.
    :target: http://choosealicense.com/licenses/apache-2.0/
    :alt: License
 
-.. image:: https://badge.waffle.io/mogproject/easy-alert-process.svg?label=ready&title=Ready
-   :target: https://waffle.io/mogproject/easy-alert-process
+.. image:: https://badge.waffle.io/mogproject/easy-alert.svg?label=ready&title=Ready
+   :target: https://waffle.io/mogproject/easy-alert
    :alt: 'Stories in Ready'
 
 --------
@@ -45,11 +45,12 @@ Configuration Example
 ---------------------
 
 ``/etc/easy-alert/easy-alert.yml``::
+
     ---
     watchers:
       process:
         - { name: syslogd, error: "=1", regexp: "^/usr/sbin/syslogd" }
-        - { name: awesome batch, error: "<=2", warn: "<=1", regexp: "^/usr/local/bin/awesome arg1 arg2" }
+        - { name: awesome batch, error: "<=3", warn: "<=2", regexp: "^/usr/local/bin/awesome arg1 arg2" }
 
     notifiers:
       email:
@@ -65,7 +66,8 @@ Quickstart Guide
 (todo)
 
 ::
-    easy-alert --type process --check
+
+    easy-alert process --check
 
 ---------
 Upgrading
