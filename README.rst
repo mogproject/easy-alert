@@ -25,7 +25,7 @@ Dependencies
 
 * Python >= 2.6
 * pyyaml
-* ``/bin/ps``
+* /bin/ps
 
 ------------
 Installation
