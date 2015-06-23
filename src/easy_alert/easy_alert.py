@@ -7,7 +7,7 @@ def main():
     Main function
     """
     setting = Setting().parse_args(sys.argv)
-    setting.logger.info('Script started.')
+    setting.logger.info('Script started: args=%s' % sys.argv[1:])
 
     try:
         setting = setting.load_config()
