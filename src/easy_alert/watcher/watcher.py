@@ -13,3 +13,6 @@ class Watcher(CaseClass):
     @abstractmethod
     def watch(self):
         """abstract method"""
+
+    def after_success(self):
+        pass

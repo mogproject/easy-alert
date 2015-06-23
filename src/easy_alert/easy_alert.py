@@ -1,6 +1,5 @@
 import sys
 from setting import Setting
-from itertools import chain
 
 
 def main():
@@ -12,9 +11,11 @@ def main():
 
     try:
         setting = setting.load_config()
-        for alert in chain.from_iterable(w.watch() for w in setting.watchers):
-            for n in setting.notifiers:
-                n.notify(alert)
+        for watcher in setting.watchers:
+            for alert in watcher.watch():
+                for notifier in setting.notifiers:
+                    notifier.notify(alert)
+            watcher.after_success()
     except Exception as e:
         setting.logger.error('Script ended with error: %s: %s' % (e.__class__.__name__, e))
         setting.logger.traceback()

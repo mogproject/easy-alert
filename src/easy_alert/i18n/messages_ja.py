@@ -14,4 +14,13 @@ MSG_PROC_STATUS_FORMAT = u'[%(level)s] %(name)s: %(count)s ("%(condition)s" に�
 MSG_PROC_ALERT_TITLE = u'プロセス異常を検知しました'
 MSG_PROC_ALERT = u'サーバ %(server_id)s にて、以下のプロセス異常を検知しました。\n\n%(result)s\n\n以上'
 
+MSG_LOG_SUMMARY = u'[%(tag)s]: %(count)d件'
+MSG_LOG_SNIP = u'(省略されました)'
+MSG_LOG_ALERT_TITLE = u'エラーログを検知しました'
+MSG_LOG_ALERT = u'サーバ %(server_id)s にて、以下のエラーを検知しました。\n\n%(result)s\n以上'
+MSG_LOG_ALERT_PENDING_TITLE = u'ログ監視が滞留している可能性があります'
+MSG_LOG_ALERT_PENDING = u"""サーバ %(server_id)s にて、ログ監視滞留の兆候を検知しました。\n
+パターン %(pattern)s にマッチするファイルが複数存在します。\n\n%(paths)s\n
+ファイルの状態を確認し、問題があれば Fluentd および各アプリケーションの再起動を試みてください。"""
+
 MSG_SUBJECT_FORMAT = u'【%(level)s】[%(group_id)s:%(server_id)s] %(title)s (%(start_time)s)'

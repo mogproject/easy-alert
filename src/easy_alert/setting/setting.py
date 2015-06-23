@@ -1,7 +1,7 @@
 import arg_parser
 import yaml
 from easy_alert.util import CaseClass, SystemLogger
-from easy_alert.watcher import ProcessWatcher
+from easy_alert.watcher import ProcessWatcher, LogWatcher
 from easy_alert.notifier import EmailNotifier
 
 
@@ -48,6 +48,8 @@ class Setting(CaseClass):
     def _parse_watcher_config(self, k, v):
         if k == 'process':
             return ProcessWatcher(v)
+        elif k == 'log':
+            return LogWatcher(v, self.print_only, self.logger)
         else:
             raise Exception('Not supported.')
 

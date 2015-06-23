@@ -1,1 +1,2 @@
-from alert import Alert, Level
+from alert import Alert
+from level import Level
