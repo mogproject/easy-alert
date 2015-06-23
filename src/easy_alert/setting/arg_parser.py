@@ -2,6 +2,9 @@ from optparse import OptionParser
 
 
 VERSION = 'easy-alert %s' % __import__('easy_alert').__version__
+USAGE = """
+  %prog [options] process
+  %prog [options] log"""
 DEFAULT_CONF_PATH = '/etc/easy-alert/easy-alert.yml'
 
 
@@ -9,7 +12,7 @@ def get_parser():
     """
     Get command line arguments parser
     """
-    parser = OptionParser(version=VERSION)
+    parser = OptionParser(version=VERSION, usage=USAGE)
 
     parser.add_option(
         '--config', dest='config_path', default=DEFAULT_CONF_PATH, type='string',
