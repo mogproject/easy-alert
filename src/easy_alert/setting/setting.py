@@ -1,7 +1,7 @@
 import arg_parser
 import yaml
 from easy_alert.util import CaseClass, SystemLogger
-from easy_alert.watcher import ProcessWatcher, LogWatcher
+from easy_alert.watcher import ProcessWatcher, LogWatcher, SSHWatcher
 from easy_alert.notifier import EmailNotifier
 
 
@@ -50,6 +50,8 @@ class Setting(CaseClass):
             return ProcessWatcher(v)
         elif k == 'log':
             return LogWatcher(v, self.print_only, self.logger)
+        elif k == 'ssh':
+            return SSHWatcher(v)
         else:
             raise Exception('Not supported.')
 

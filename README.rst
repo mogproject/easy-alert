@@ -51,6 +51,10 @@ Configuration Example
       process:
         - { name: syslogd, error: "=1", regexp: "^/usr/sbin/syslogd" }
         - { name: awesome batch, error: "<=3", warn: "<=2", regexp: "^/usr/local/bin/awesome arg1 arg2" }
+      ssh:
+        - { dynamic: "aws ec2 describe-instances --output text --query 'sort_by(Reservations[].Instances[?not_null(Tags[?Key==`Name`].Value)][].[PrivateIpAddress,Tags[?Key==`Name`].Value|[0]],&[1])'", user: ec2-user, key: ~/.ssh/your.key.pem }
+        - { name: web-1, host: xxx.xxx.xxx.xxx, user: ec2-user, key: ~/.ssh/your.key.pem }
+        - { name: web-2, host: yyy.example.com, user: ec2-user, key: ~/.ssh/your.key.pem }
 
     notifiers:
       email:
@@ -68,6 +72,9 @@ Quickstart Guide
 ::
 
     easy-alert process --check
+    easy-alert process
+    easy-alert ssh --check
+    easy-alert ssh
 
 ---------
 Upgrading
