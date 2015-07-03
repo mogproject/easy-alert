@@ -53,7 +53,8 @@ class LogWatcher(Watcher):
 
     DEFAULT_TARGET_PATTERN = 'alert.????????_????_*.log'
     DEFAULT_PENDING_PATTERN = 'alert.????????_????*'
-    DEFAULT_MESSAGE_THRESHOLD = 15
+    DEFAULT_MESSAGE_NUM_THRESHOLD = 15
+    DEFAULT_MESSAGE_LEN_THRESHOLD = 1024
     DEFAULT_PENDING_THRESHOLD = 3
 
     def __init__(self, config, print_only, logger):
@@ -63,7 +64,8 @@ class LogWatcher(Watcher):
 
         super(LogWatcher, self).__init__(
             watch_dir=watch_dir, target_pattern=target_pattern, pending_pattern=pending_pattern,
-            message_threshold=config.get('message_threshold') or self.DEFAULT_MESSAGE_THRESHOLD,
+            message_num_threshold=config.get('message_num_threshold') or self.DEFAULT_MESSAGE_NUM_THRESHOLD,
+            message_len_threshold=config.get('message_len_threshold') or self.DEFAULT_MESSAGE_LEN_THRESHOLD,
             pending_threshold=config.get('pending_threshold') or self.DEFAULT_PENDING_THRESHOLD,
             print_only=print_only,
             logger=logger,
@@ -115,7 +117,8 @@ class LogWatcher(Watcher):
                 msg = json.loads(tokens[2].decode('utf-8', 'ignore'))['message']
                 cnt, msgs = d[tag]
                 cnt += 1
-                msgs += [msg] if cnt <= self.message_threshold else []
+                # trim string
+                msgs += [msg[:self.message_len_threshold]] if cnt <= self.message_num_threshold else []
                 d[tag] = (cnt, msgs)
                 if max_level == Level(WARN) and tag.endswith('.error'):
                     max_level = Level(ERROR)
@@ -127,6 +130,6 @@ class LogWatcher(Watcher):
             cnt, msgs = result[k]
             buf.append(MSG_LOG_SUMMARY % {'tag': k, 'count': cnt})
             buf += msgs
-            buf += [MSG_LOG_SNIP] if cnt > self.message_threshold else []
+            buf += [MSG_LOG_SNIP] if cnt > self.message_num_threshold else []
             buf.append('')
         return '\n'.join(buf)

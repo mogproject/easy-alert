@@ -7,7 +7,7 @@ def get_version():
     import sys
 
     sys.path[:0] = [SRC_DIR]
-    return __import__('easy_alert.easy_alert').__version__
+    return __import__('easy_alert').__version__
 
 
 setup(
@@ -19,6 +19,7 @@ setup(
     url='https://github.com/mogproject/easy-alert',
     install_requires=[
         'pyyaml',
+        'paramiko',
     ],
     tests_require=[
     ],

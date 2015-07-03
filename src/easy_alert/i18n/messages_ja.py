@@ -23,4 +23,8 @@ MSG_LOG_ALERT_PENDING = u"""サーバ %(server_id)s にて、ログ監視滞留�
 パターン %(pattern)s にマッチするファイルが複数存在します。\n\n%(paths)s\n
 ファイルの状態を確認し、問題があれば Fluentd および各アプリケーションの再起動を試みてください。"""
 
+MSG_SSH_STATUS_FORMAT = u'[%(name)s](%(user)s@%(host)s:%(port)d): %(msg)s'
+MSG_SSH_ALERT_TITLE = u'SSH疎通異常を検知しました'
+MSG_SSH_ALERT = u'サーバ %(server_id)s から、以下のサーバに対する SSH 疎通確認に失敗しました。\n\n%(result)s\n\n以上'
+
 MSG_SUBJECT_FORMAT = u'【%(level)s】[%(group_id)s:%(server_id)s] %(title)s (%(start_time)s)'
