@@ -9,24 +9,93 @@ from easy_alert.util import CaseClass, get_server_id
 from easy_alert.i18n import *
 
 
+class ProcessReader(object):
+    """
+    Read process information from operating system
+    """
+
+    def read(self):
+        """
+        Get the running processes information
+        :return: dict of process id -> tuple(parent process id, args string)
+        """
+
+        def f(line):
+            tokens = line.split(None, 2)
+            return int(tokens[0]), (int(tokens[1]), tokens[2])
+
+        # trim header line then parse
+        return dict(map(f, self._read_raw().splitlines()[1:]))
+
+    def _read_raw(self):
+        cmd = ['/bin/ps', 'ax', '-o', 'pid,ppid,args']
+        return subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
+
+
+class ProcessCounter(CaseClass):
+    """
+    Count the number of the processes
+    """
+
+    def __init__(self, process_dict):
+        super(ProcessCounter, self).__init__(['process_dict', 'cache_distinct', 'cache_aggregated'])
+        self.process_dict = process_dict
+        self.cache_distinct = None
+        self.cache_aggregated = None
+
+    def count(self, regexp, aggregate=True):
+        pattern = re.compile(regexp)
+        d = self._aggregate() if aggregate else self._distinct()
+        return sum(x * bool(pattern.search(s)) for s, x in d.items())
+
+    def _distinct(self):
+        """
+        :return: dict of args string -> count with default value (0)
+        """
+        if self.cache_distinct is None:
+            d = defaultdict(int)
+            for ppid, args in self.process_dict.values():
+                d[args] += 1
+            self.cache_distinct = d
+        return self.cache_distinct
+
+    def _aggregate(self):
+        """
+        Aggregate forked processes.
+        That is, if the 'args' strings of one process is same as the parent process, it is not counted.
+
+        :return: dict of args string -> count with default value (0)
+        """
+        if self.cache_aggregated is None:
+            d = defaultdict(int)
+            for ppid, args in self.process_dict.values():
+                parent = self.process_dict.get(ppid)
+                if parent is None or parent[1] != args:
+                    d[args] += 1
+            self.cache_aggregated = d
+
+        return self.cache_aggregated
+
+
 class ProcessWatcher(Watcher):
     """
     Watch the number of the running processes
     """
 
-    def __init__(self, alert_settings):
-        super(ProcessWatcher, self).__init__(alert_settings=alert_settings)
+    def __init__(self, alert_settings, process_reader=ProcessReader()):
+        super(ProcessWatcher, self).__init__(alert_settings=alert_settings, process_reader=process_reader)
 
     def watch(self):
         """
         :return: list of Alert instances
         """
         start_time = datetime.now()
-        ps = self.ProcessList()
+        pc = ProcessCounter(self.process_reader.read())
 
         result = []
         for s in self.alert_settings:
-            st = self.ProcessStatus(s['name'], ps.count(s['regexp']), self._make_conditions(s))
+            st = self.ProcessStatus(
+                s['name'], pc.count(s['regexp'], s.get('aggregate', True)), self._make_conditions(s))
             if st.level:
                 result.append(st)
 
@@ -44,29 +113,6 @@ class ProcessWatcher(Watcher):
         """
         ret = [(l, alert_setting.get(l.get_keyword())) for l in Level.seq if l.get_keyword() in alert_setting]
         return ret
-
-    class ProcessList(object):
-        def __init__(self):
-            self.process_list = self._get_process_list()
-
-        def count(self, regexp):
-            pattern = re.compile(regexp)
-            return sum(x * bool(pattern.search(s)) for s, x in self.process_list.items())
-
-        @staticmethod
-        def _get_process_list():
-            """
-            Get list of the args string of the running processes
-            :return: dict of (args, count)
-            """
-            cmd = ['/bin/ps', 'ax', '-o', 'args']
-            out = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-
-            # trim header line
-            d = defaultdict(int)
-            for line in out.split('\n')[1:]:
-                d[line] += 1
-            return d
 
     class ProcessStatus(CaseClass):
         def __init__(self, name, count, conditions):
