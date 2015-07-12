@@ -5,6 +5,18 @@ easy-alert
 Super Simple Process Monitoring Tool.
 
 
+.. image:: https://badge.fury.io/py/easy-alert.svg
+   :target: http://badge.fury.io/py/easy-alert
+   :alt: PyPI version
+
+.. image:: https://travis-ci.org/mogproject/easy-alert.svg?branch=master
+   :target: https://travis-ci.org/mogproject/easy-alert
+   :alt: Build Status
+
+.. image:: https://coveralls.io/repos/mogproject/easy-alert/badge.png?branch=master
+   :target: https://coveralls.io/r/mogproject/easy-alert?branch=master
+   :alt: Coverage Status
+
 .. image:: https://img.shields.io/badge/license-Apache%202.0-blue.svg
    :target: http://choosealicense.com/licenses/apache-2.0/
    :alt: License
