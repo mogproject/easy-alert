@@ -4,7 +4,6 @@ easy-alert
 
 Super Simple Process Monitoring Tool.
 
-
 .. image:: https://badge.fury.io/py/easy-alert.svg
    :target: http://badge.fury.io/py/easy-alert
    :alt: PyPI version
@@ -13,9 +12,10 @@ Super Simple Process Monitoring Tool.
    :target: https://travis-ci.org/mogproject/easy-alert
    :alt: Build Status
 
-.. image:: https://coveralls.io/repos/mogproject/easy-alert/badge.png?branch=master
-   :target: https://coveralls.io/r/mogproject/easy-alert?branch=master
+.. image:: https://coveralls.io/repos/mogproject/easy-alert/badge.svg?branch=master&service=github
+   :target: https://coveralls.io/github/mogproject/easy-alert?branch=master
    :alt: Coverage Status
+
 
 .. image:: https://img.shields.io/badge/license-Apache%202.0-blue.svg
    :target: http://choosealicense.com/licenses/apache-2.0/
@@ -43,13 +43,22 @@ Dependencies
 Installation
 ------------
 
-(todo)
+* ``pip`` command may need ``sudo``
 
-Just install via pip! (may need ``sudo``)::
++-------------+---------------------------------------+
+| Operation   | Command                               |
++=============+=======================================+
+| Install     |``pip install easy-alert``             |
++-------------+---------------------------------------+
+| Upgrade     |``pip install --upgrade easy-alert``   |
++-------------+---------------------------------------+
+| Uninstall   |``pip uninstall easy-alert``           |
++-------------+---------------------------------------+
 
-    pip install easy-alert
+* Check installed version: ``easy-alert --version``
 
-Then, write your configuration to the file ``/etc/easy-alert/easy-alert.yml``.
+* Then, write your configuration to the file ``/etc/easy-alert/easy-alert.yml``.
+
 See an example below.
 
 ---------------------
@@ -88,19 +97,3 @@ Quickstart Guide
     easy-alert ssh --check
     easy-alert ssh
 
----------
-Upgrading
----------
-::
-
-    pip install --upgrade easy-alert
-    easy-alert --version
-
---------------
-Uninstallation
---------------
-::
-
-    pip uninstall easy-alert
-
-(may need ``sudo``)
