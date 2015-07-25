@@ -18,6 +18,7 @@ class SSHWatcher(Watcher):
     CONNECTION_TIMEOUT = 10  # seconds
 
     def __init__(self, ssh_settings):
+        # TODO: check setting
         super(SSHWatcher, self).__init__(ssh_settings=ssh_settings)
 
     def watch(self):

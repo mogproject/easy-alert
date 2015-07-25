@@ -1,0 +1,5 @@
+---
+watchers:
+  process:
+    - { name: syslogd, error: "=1", regexp: "^/usr/sbin/syslogd" }
+

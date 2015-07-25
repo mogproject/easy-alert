@@ -22,6 +22,7 @@ setup(
         'paramiko',
     ],
     tests_require=[
+        'unittest2',
     ],
     package_dir={'': SRC_DIR},
     packages=find_packages(SRC_DIR),

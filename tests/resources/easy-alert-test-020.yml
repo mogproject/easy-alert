@@ -1,0 +1,5 @@
+---
+watchers:
+  ssh:
+notifiers:
+

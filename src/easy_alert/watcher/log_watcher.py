@@ -58,6 +58,7 @@ class LogWatcher(Watcher):
     DEFAULT_PENDING_THRESHOLD = 3
 
     def __init__(self, config, print_only, logger):
+        # TODO: check setting
         watch_dir = config['watch_dir']
         target_pattern = os.path.join(watch_dir, config.get('target_pattern') or self.DEFAULT_TARGET_PATTERN)
         pending_pattern = os.path.join(watch_dir, config.get('pending_pattern') or self.DEFAULT_PENDING_PATTERN)

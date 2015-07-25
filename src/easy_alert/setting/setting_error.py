@@ -1,0 +1,2 @@
+class SettingError(Exception):
+    pass

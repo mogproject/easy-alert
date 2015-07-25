@@ -1,0 +1,8 @@
+---
+watchers:
+  xxx:
+    - 1
+    - 2
+    - 3
+notifiers:
+
