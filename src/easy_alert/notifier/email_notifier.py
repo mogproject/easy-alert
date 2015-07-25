@@ -4,20 +4,22 @@ from email.header import Header
 from email.utils import formatdate
 from notifier import Notifier
 from easy_alert.i18n import EMAIL_ENCODING
+from easy_alert.setting.setting_error import SettingError
 
 
 class EmailNotifier(Notifier):
-    def __init__(self,
-                 group_id,
-                 from_address,
-                 to_address_list,
-                 smtp_server,
-                 smtp_port,
-                 print_only,
-                 logger):
-        super(EmailNotifier, self).__init__(
-            group_id, from_address=from_address, to_address_list=to_address_list, smtp_server=smtp_server,
-            smtp_port=smtp_port, print_only=print_only, logger=logger)
+    def __init__(self, notify_setting, print_only, logger):
+        try:
+            super(EmailNotifier, self).__init__(
+                notify_setting['group_id'],
+                from_address=notify_setting['from_address'],
+                to_address_list=notify_setting['to_address_list'],
+                smtp_server=notify_setting['smtp_server'],
+                smtp_port=notify_setting['smtp_port'],
+                print_only=print_only,
+                logger=logger)
+        except KeyError as e:
+            raise SettingError('Not found EmailNotifier config key: %s' % e.message)
 
     def notify(self, alert):
         subject = self.get_subject(alert)

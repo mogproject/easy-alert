@@ -38,6 +38,7 @@ class ProcessCounter(CaseClass):
     """
 
     def __init__(self, process_dict):
+        # TODO: check setting
         super(ProcessCounter, self).__init__(['process_dict', 'cache_distinct', 'cache_aggregated'])
         self.process_dict = process_dict
         self.cache_distinct = None

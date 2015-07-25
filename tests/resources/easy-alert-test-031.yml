@@ -1,0 +1,12 @@
+---
+watchers:
+  process:
+    - 1
+    - 2
+    - 3
+notifiers:
+  xxx:
+    - 1
+    - 2
+    - 3
+
