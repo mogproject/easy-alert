@@ -66,7 +66,7 @@ class LogWatcher(Watcher):
     DEFAULT_MESSAGE_LEN_THRESHOLD = 1024
     DEFAULT_PENDING_THRESHOLD = 3
 
-    def __init__(self, alert_setting, print_only, logger):
+    def __init__(self, alert_setting, print_only):
         if not isinstance(alert_setting, dict):
             raise SettingError('LogWatcher settings not a dict: %s' % alert_setting)
 
@@ -84,7 +84,7 @@ class LogWatcher(Watcher):
 
         super(LogWatcher, self).__init__(
             watch_dir=watch_dir, target_pattern=tp, pending_pattern=pp, message_num_threshold=nt,
-            message_len_threshold=lt, pending_threshold=pt, print_only=print_only, logger=logger, target_paths=None
+            message_len_threshold=lt, pending_threshold=pt, print_only=print_only, target_paths=None
         )
 
     def watch(self):
@@ -112,7 +112,7 @@ class LogWatcher(Watcher):
 
         for path in self.target_paths:
             if self.print_only:
-                self.logger.info('Would remove: %s' % path)
+                print('Would remove: %s' % path)
             else:
                 os.remove(path)
 

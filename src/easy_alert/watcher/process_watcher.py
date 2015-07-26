@@ -169,8 +169,8 @@ class ProcessWatcher(Watcher):
         pc = ProcessCounter(self.process_reader.read())
 
         result = []
-        for s in self.settings:
-            st = self.ProcessStatus(s[0], pc.count(s[1], s[2]), s[3])
+        for name, pattern, aggregate, conditions in self.settings:
+            st = self.ProcessStatus(name, pc.count(pattern, aggregate), conditions)
             if st.level:
                 result.append(st)
 

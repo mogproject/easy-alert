@@ -174,9 +174,7 @@ class TestSetting(unittest.TestCase):
             {'name': 'b', 'regexp': '.*', 'error': '<=1'},
             {'name': 'c', 'regexp': '.*', 'error': '>=1'},
         ])
-        log_watcher = LogWatcher({
-            'watch_dir': 'resources/log_watcher'
-        }, False, SystemLogger())
+        log_watcher = LogWatcher({'watch_dir': 'resources/log_watcher'}, False)
         notifier = EmailNotifier(
             {
                 'group_id': 'awesome',
