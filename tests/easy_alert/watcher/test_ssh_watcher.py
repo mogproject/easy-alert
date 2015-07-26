@@ -1,12 +1,11 @@
 import sys
+from easy_alert.setting.setting_error import SettingError
+from easy_alert.watcher.ssh_watcher import SSHWatcher
 
 if sys.version_info < (2, 7):
     import unittest2 as unittest
 else:
     import unittest
-
-from easy_alert.setting.setting_error import SettingError
-from easy_alert.watcher.ssh_watcher import SSHWatcher
 
 
 class TestSSHWatcher(unittest.TestCase):
