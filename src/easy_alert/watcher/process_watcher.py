@@ -111,7 +111,7 @@ class ProcessWatcher(Watcher):
     """
     Watch the number of the running processes
 
-    configuration
+    configuration should be a list of this dict
       name   [required]: short description for the process
       regexp [required]: process argument string to be counted in regular expression
       aggregate        : aggregate forked processes (counted as one) if true (default:true)

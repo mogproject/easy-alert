@@ -16,6 +16,14 @@ class LogWatcher(Watcher):
     """
     Watch the log files filtered by Fluentd (td-agent)
 
+    configuration should be this dict
+      watch_dir  [required]: path to the directory to watch
+      target_pattern       : glob pattern for the target files
+      pending_pattern      : glob pattern for checking pending files
+      message_num_threshold: maximum number of messages for each log level
+      message_len_threshold: maximum length for each message
+      pending_threshold    : threshold number of files for checking pending files
+
     The settings of td-agent.conf should be like this.
 
     # Watch the log file
