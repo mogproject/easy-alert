@@ -9,6 +9,20 @@ from easy_alert.util import get_server_id
 
 
 class CommandWatcher(Watcher):
+    """
+    Check the result of executing the external command
+
+    configuration should be a list of this dict
+      name    [required]: short description for the command
+      level   [required]: alert level (should be in {critical, error, warn, info, debug})
+      command [required]: command line string
+      expect_code       : expected exit code number
+      expect_stdout     : expected stdout pattern in regexp
+      expect_stderr     : expected stderr pattern in regexp
+
+    Any of {expect_code, expect_stdout, expect_stderr} is required.
+    """
+
     def __init__(self, command_setting):
         if not isinstance(command_setting, list):
             raise SettingError('CommandWatcher settings not a list: %s' % command_setting)
