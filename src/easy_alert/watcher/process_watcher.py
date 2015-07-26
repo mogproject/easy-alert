@@ -147,7 +147,8 @@ class ProcessWatcher(Watcher):
 
         super(ProcessWatcher, self).__init__(settings=settings, process_reader=process_reader)
 
-    def _parse_conditions(self, setting):
+    @staticmethod
+    def _parse_conditions(setting):
         """
         :return: sorted list of tuple(Level, Condition) by level (severest first)
         """
