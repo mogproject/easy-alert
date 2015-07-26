@@ -1,12 +1,7 @@
 ---
 watchers:
-  process:
-    - { name: a, regexp: ".*", error: "=1" }
-    - { name: b, regexp: ".*", error: "<=1" }
-    - { name: c, regexp: ".*", error: ">=1" }
   log:
-    watch_dir: resources/log_watcher
-
+    xxx: 1
 notifiers:
   email:
     group_id: awesome

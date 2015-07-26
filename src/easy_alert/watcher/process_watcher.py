@@ -141,7 +141,7 @@ class ProcessWatcher(Watcher):
             except KeyError as e:
                 raise SettingError('ProcessWatcher not found config key: %s' % e.message)
             except Exception as e:
-                raise SettingError('ProcessWatcher settings syntax error: %s' % e.message)
+                raise SettingError('ProcessWatcher settings syntax error: %s' % e)
 
             settings.append((name, pattern, aggregate, conditions))
 
