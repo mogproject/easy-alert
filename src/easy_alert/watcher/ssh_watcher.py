@@ -49,7 +49,7 @@ class SSHWatcher(Watcher):
                 host = None if is_dynamic else s['host']
                 settings.append((user, key, port, is_dynamic, name, host, dynamic_cmd))
             except KeyError as e:
-                raise SettingError('SSHWatcher not found config key: %s' % e.message)
+                raise SettingError('SSHWatcher not found config key: %s' % e)
             except Exception as e:
                 raise SettingError('SSHWatcher settings syntax error: %s' % e)
 

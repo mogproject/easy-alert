@@ -78,7 +78,7 @@ class LogWatcher(Watcher):
             lt = int(alert_setting.get('message_len_threshold') or self.DEFAULT_MESSAGE_LEN_THRESHOLD)
             pt = int(alert_setting.get('pending_threshold') or self.DEFAULT_PENDING_THRESHOLD)
         except KeyError as e:
-            raise SettingError('LogWatcher not found config key: %s' % e.message)
+            raise SettingError('LogWatcher not found config key: %s' % e)
         except Exception as e:
             raise SettingError('LogWatcher settings syntax error: %s' % e)
 

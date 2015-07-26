@@ -14,15 +14,15 @@ class TestSSHWatcher(unittest.TestCase):
         def assert_err(setting, expected):
             with self.assertRaises(SettingError) as cm:
                 SSHWatcher(setting)
-            self.assertEqual(cm.exception.message, expected)
+            self.assertEqual(cm.exception.args[0], expected)
 
         assert_err('xxx', 'SSHWatcher settings not a list: xxx')
         assert_err({}, 'SSHWatcher settings not a list: {}')
         assert_err([[]], 'SSHWatcher settings not a dict: []')
-        assert_err([{}], 'SSHWatcher not found config key: user')
-        assert_err([{'user': 'user'}], 'SSHWatcher not found config key: key')
-        assert_err([{'user': 'user', 'key': 'path/to/key'}], 'SSHWatcher not found config key: name')
-        assert_err([{'user': 'user', 'key': 'path/to/key', 'name': 's'}], 'SSHWatcher not found config key: host')
+        assert_err([{}], "SSHWatcher not found config key: 'user'")
+        assert_err([{'user': 'user'}], "SSHWatcher not found config key: 'key'")
+        assert_err([{'user': 'user', 'key': 'path/to/key'}], "SSHWatcher not found config key: 'name'")
+        assert_err([{'user': 'user', 'key': 'path/to/key', 'name': 's'}], "SSHWatcher not found config key: 'host'")
         assert_err([{'user': 'user', 'key': 'path/to/key', 'port': 'a', 'name': 's', 'host': 'h'}],
                    "SSHWatcher settings syntax error: invalid literal for int() with base 10: 'a'")
 

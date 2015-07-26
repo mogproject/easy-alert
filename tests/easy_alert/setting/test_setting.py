@@ -104,13 +104,13 @@ class TestSetting(unittest.TestCase):
     def test_load_config_assertion(self):
         with self.assertRaises(AssertionError) as cm:
             Setting().load_config()
-        self.assertEqual(cm.exception.message, 'watcher_types should be set before load_config')
+        self.assertEqual(cm.exception.args[0], 'watcher_types should be set before load_config')
         with self.assertRaises(AssertionError) as cm:
             Setting(['process']).load_config()
-        self.assertEqual(cm.exception.message, 'config_path should be set before load_config')
+        self.assertEqual(cm.exception.args[0], 'config_path should be set before load_config')
         with self.assertRaises(AssertionError) as cm:
             Setting(['process'], 'xxx').load_config()
-        self.assertEqual(cm.exception.message, 'print_only should be set before load_config')
+        self.assertEqual(cm.exception.args[0], 'print_only should be set before load_config')
 
     def test_load_config_not_found(self):
         self.assertRaises(IOError, Setting(['process'], 'tests/resources/__not_exist__', False).load_config)
@@ -118,13 +118,13 @@ class TestSetting(unittest.TestCase):
     def test_load_config_no_watcher_entry(self):
         with self.assertRaises(SettingError) as cm:
             Setting(['process'], 'tests/resources/easy-alert-test-000.yml', False).load_config()
-        self.assertEqual(cm.exception.message, 'Syntax error: tests/resources/easy-alert-test-000.yml')
+        self.assertEqual(cm.exception.args[0], 'Syntax error: tests/resources/easy-alert-test-000.yml')
         with self.assertRaises(SettingError) as cm:
             Setting(['process'], 'tests/resources/easy-alert-test-001.yml', False).load_config()
-        self.assertEqual(cm.exception.message, 'Syntax error: tests/resources/easy-alert-test-001.yml')
+        self.assertEqual(cm.exception.args[0], 'Syntax error: tests/resources/easy-alert-test-001.yml')
         with self.assertRaises(SettingError) as cm:
             Setting(['process'], 'tests/resources/easy-alert-test-002.yml', False).load_config()
-        self.assertEqual(cm.exception.message, 'Not found "watchers" entry: tests/resources/easy-alert-test-002.yml')
+        self.assertEqual(cm.exception.args[0], 'Not found "watchers" entry: tests/resources/easy-alert-test-002.yml')
 
     def test_load_config_invalid_yaml(self):
         self.assertRaises(ScannerError,
@@ -133,40 +133,40 @@ class TestSetting(unittest.TestCase):
     def test_load_config_watcher_parse_error(self):
         with self.assertRaises(SettingError) as cm:
             Setting(['process'], 'tests/resources/easy-alert-test-020.yml', False).load_config()
-        self.assertEqual(cm.exception.message,
+        self.assertEqual(cm.exception.args[0],
                          'Not found watcher configuration for "process": tests/resources/easy-alert-test-020.yml')
         with self.assertRaises(SettingError) as cm:
             Setting(['xxx'], 'tests/resources/easy-alert-test-021.yml', False).load_config()
-        self.assertEqual(cm.exception.message, 'Unsupported watcher type: xxx')
+        self.assertEqual(cm.exception.args[0], 'Unsupported watcher type: xxx')
         with self.assertRaises(SettingError) as cm:
             Setting(['process'], 'tests/resources/easy-alert-test-022.yml', False).load_config()
-        self.assertEqual(cm.exception.message, 'Syntax error: tests/resources/easy-alert-test-022.yml')
+        self.assertEqual(cm.exception.args[0], 'Syntax error: tests/resources/easy-alert-test-022.yml')
         with self.assertRaises(SettingError) as cm:
             Setting(['process'], 'tests/resources/easy-alert-test-023.yml', False).load_config()
-        self.assertEqual(cm.exception.message, 'Syntax error: tests/resources/easy-alert-test-023.yml')
+        self.assertEqual(cm.exception.args[0], 'Syntax error: tests/resources/easy-alert-test-023.yml')
 
     def test_load_config_notifier_parser_error(self):
         with self.assertRaises(SettingError) as cm:
             Setting(['process'], 'tests/resources/easy-alert-test-030.yml', False).load_config()
-        self.assertEqual(cm.exception.message, 'Not found "notifiers" entry: tests/resources/easy-alert-test-030.yml')
+        self.assertEqual(cm.exception.args[0], 'Not found "notifiers" entry: tests/resources/easy-alert-test-030.yml')
         with self.assertRaises(SettingError) as cm:
             Setting(['process'], 'tests/resources/easy-alert-test-031.yml', False).load_config()
-        self.assertEqual(cm.exception.message,
+        self.assertEqual(cm.exception.args[0],
                          'Unsupported notifier type: xxx in tests/resources/easy-alert-test-031.yml')
         with self.assertRaises(SettingError) as cm:
             Setting(['process'], 'tests/resources/easy-alert-test-032.yml', False).load_config()
-        self.assertEqual(cm.exception.message, 'Syntax error: tests/resources/easy-alert-test-032.yml')
+        self.assertEqual(cm.exception.args[0], 'Syntax error: tests/resources/easy-alert-test-032.yml')
         with self.assertRaises(SettingError) as cm:
             Setting(['process'], 'tests/resources/easy-alert-test-033.yml', False).load_config()
-        self.assertEqual(cm.exception.message, 'Syntax error: tests/resources/easy-alert-test-033.yml')
+        self.assertEqual(cm.exception.args[0], 'Syntax error: tests/resources/easy-alert-test-033.yml')
 
     def test_load_config_email_notifier(self):
         with self.assertRaises(SettingError) as cm:
             Setting(['process'], 'tests/resources/easy-alert-test-040.yml', False).load_config()
-        self.assertEqual(cm.exception.message, 'EmailNotifier not found config key: group_id')
+        self.assertEqual(cm.exception.args[0], "EmailNotifier not found config key: 'group_id'")
         with self.assertRaises(SettingError) as cm:
             Setting(['process'], 'tests/resources/easy-alert-test-041.yml', False).load_config()
-        self.assertEqual(cm.exception.message, 'EmailNotifier settings not a dict: xxx')
+        self.assertEqual(cm.exception.args[0], 'EmailNotifier settings not a dict: xxx')
 
     def test_load_config_normal(self):
         proc_watcher = ProcessWatcher([
@@ -207,22 +207,22 @@ class TestSetting(unittest.TestCase):
     def test_load_config_log_watcher_error(self):
         with self.assertRaises(SettingError) as cm:
             Setting(['log'], 'tests/resources/easy-alert-test-050.yml', False).load_config()
-        self.assertEqual(cm.exception.message, 'LogWatcher settings not a dict: xxx')
+        self.assertEqual(cm.exception.args[0], 'LogWatcher settings not a dict: xxx')
         with self.assertRaises(SettingError) as cm:
             Setting(['log'], 'tests/resources/easy-alert-test-051.yml', False).load_config()
-        self.assertEqual(cm.exception.message, 'LogWatcher settings not a dict: [{}, {}]')
+        self.assertEqual(cm.exception.args[0], 'LogWatcher settings not a dict: [{}, {}]')
         with self.assertRaises(SettingError) as cm:
             Setting(['log'], 'tests/resources/easy-alert-test-052.yml', False).load_config()
-        self.assertEqual(cm.exception.message, 'LogWatcher not found config key: watch_dir')
+        self.assertEqual(cm.exception.args[0], "LogWatcher not found config key: 'watch_dir'")
         with self.assertRaises(SettingError) as cm:
             Setting(['log'], 'tests/resources/easy-alert-test-053.yml', False).load_config()
-        self.assertEqual(cm.exception.message,
+        self.assertEqual(cm.exception.args[0],
                          "LogWatcher settings syntax error: invalid literal for int() with base 10: 'a'")
         with self.assertRaises(SettingError) as cm:
             Setting(['log'], 'tests/resources/easy-alert-test-054.yml', False).load_config()
-        self.assertEqual(cm.exception.message,
+        self.assertEqual(cm.exception.args[0],
                          "LogWatcher settings syntax error: invalid literal for int() with base 10: 'a'")
         with self.assertRaises(SettingError) as cm:
             Setting(['log'], 'tests/resources/easy-alert-test-055.yml', False).load_config()
-        self.assertEqual(cm.exception.message,
+        self.assertEqual(cm.exception.args[0],
                          "LogWatcher settings syntax error: invalid literal for int() with base 10: 'a'")

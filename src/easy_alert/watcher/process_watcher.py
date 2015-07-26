@@ -139,7 +139,7 @@ class ProcessWatcher(Watcher):
                 aggregate = s.get('aggregate', True)
                 conditions = self._parse_conditions(s)
             except KeyError as e:
-                raise SettingError('ProcessWatcher not found config key: %s' % e.message)
+                raise SettingError('ProcessWatcher not found config key: %s' % e)
             except Exception as e:
                 raise SettingError('ProcessWatcher settings syntax error: %s' % e)
 

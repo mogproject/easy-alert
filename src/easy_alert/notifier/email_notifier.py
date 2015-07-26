@@ -21,7 +21,7 @@ class EmailNotifier(Notifier):
                 print_only=print_only,
                 logger=logger)
         except KeyError as e:
-            raise SettingError('EmailNotifier not found config key: %s' % e.message)
+            raise SettingError('EmailNotifier not found config key: %s' % e)
 
     def notify(self, alert):
         subject = self.get_subject(alert)
