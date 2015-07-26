@@ -4,4 +4,5 @@ watchers:
     - { name: a, regexp: ".*", error: "=1" }
     - { name: b, regexp: ".*", error: "<=1" }
     - { name: c, regexp: ".*", error: ">=1" }
-notifiers: "abc"
+notifiers:
+  email: "xxx"

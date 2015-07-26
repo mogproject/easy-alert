@@ -3,7 +3,7 @@ from contextlib import contextmanager
 from StringIO import StringIO
 from easy_alert.setting import Setting, SettingError
 from yaml.scanner import ScannerError
-from easy_alert.watcher import ProcessWatcher
+from easy_alert.watcher import ProcessWatcher, LogWatcher
 from easy_alert.notifier import EmailNotifier
 from easy_alert.logger import SystemLogger, PrintLogger
 
@@ -163,9 +163,20 @@ class TestSetting(unittest.TestCase):
     def test_load_config_email_notifier(self):
         with self.assertRaises(SettingError) as cm:
             Setting(['process'], 'tests/resources/easy-alert-test-040.yml', False).load_config()
-        self.assertEqual(cm.exception.message, 'Not found EmailNotifier config key: group_id')
+        self.assertEqual(cm.exception.message, 'EmailNotifier not found config key: group_id')
+        with self.assertRaises(SettingError) as cm:
+            Setting(['process'], 'tests/resources/easy-alert-test-041.yml', False).load_config()
+        self.assertEqual(cm.exception.message, 'EmailNotifier settings not a dict: xxx')
 
     def test_load_config_normal(self):
+        proc_watcher = ProcessWatcher([
+            {'name': 'a', 'regexp': '.*', 'error': '=1'},
+            {'name': 'b', 'regexp': '.*', 'error': '<=1'},
+            {'name': 'c', 'regexp': '.*', 'error': '>=1'},
+        ])
+        log_watcher = LogWatcher({
+            'watch_dir': 'resources/log_watcher'
+        }, False, SystemLogger())
         notifier = EmailNotifier(
             {
                 'group_id': 'awesome',
@@ -174,12 +185,44 @@ class TestSetting(unittest.TestCase):
                 'from_address': 'from_address@example.com',
                 'to_address_list': 'to1@example.com,to2@example.com',
             }, False, SystemLogger())
-        expect = Setting(
+        expect1 = Setting(
             watcher_types=['process'],
             config_path='tests/resources/easy-alert-test-100.yml',
             print_only=False,
-            watchers=[ProcessWatcher([1, 2, 3])],
+            watchers=[proc_watcher],
             notifiers=[notifier],
         )
-        self.assertEqual(Setting(['process'], 'tests/resources/easy-alert-test-100.yml', False).load_config(),
-                         expect)
+        expect2 = Setting(
+            watcher_types=['process', 'log'],
+            config_path='tests/resources/easy-alert-test-100.yml',
+            print_only=False,
+            watchers=[proc_watcher, log_watcher],
+            notifiers=[notifier],
+        )
+        self.assertEqual(
+            Setting(['process'], 'tests/resources/easy-alert-test-100.yml', False).load_config(), expect1)
+        self.assertEqual(
+            Setting(['process', 'log'], 'tests/resources/easy-alert-test-100.yml', False).load_config(), expect2)
+
+    def test_load_config_log_watcher_error(self):
+        with self.assertRaises(SettingError) as cm:
+            Setting(['log'], 'tests/resources/easy-alert-test-050.yml', False).load_config()
+        self.assertEqual(cm.exception.message, 'LogWatcher settings not a dict: xxx')
+        with self.assertRaises(SettingError) as cm:
+            Setting(['log'], 'tests/resources/easy-alert-test-051.yml', False).load_config()
+        self.assertEqual(cm.exception.message, 'LogWatcher settings not a dict: [{}, {}]')
+        with self.assertRaises(SettingError) as cm:
+            Setting(['log'], 'tests/resources/easy-alert-test-052.yml', False).load_config()
+        self.assertEqual(cm.exception.message, 'LogWatcher not found config key: watch_dir')
+        with self.assertRaises(SettingError) as cm:
+            Setting(['log'], 'tests/resources/easy-alert-test-053.yml', False).load_config()
+        self.assertEqual(cm.exception.message,
+                         "LogWatcher settings syntax error: invalid literal for int() with base 10: 'a'")
+        with self.assertRaises(SettingError) as cm:
+            Setting(['log'], 'tests/resources/easy-alert-test-054.yml', False).load_config()
+        self.assertEqual(cm.exception.message,
+                         "LogWatcher settings syntax error: invalid literal for int() with base 10: 'a'")
+        with self.assertRaises(SettingError) as cm:
+            Setting(['log'], 'tests/resources/easy-alert-test-055.yml', False).load_config()
+        self.assertEqual(cm.exception.message,
+                         "LogWatcher settings syntax error: invalid literal for int() with base 10: 'a'")

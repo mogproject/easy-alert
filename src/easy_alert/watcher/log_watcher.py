@@ -9,11 +9,20 @@ from watcher import Watcher
 from easy_alert.entity import Alert, Level
 from easy_alert.util import get_server_id
 from easy_alert.i18n import *
+from easy_alert.setting.setting_error import SettingError
 
 
 class LogWatcher(Watcher):
     """
     Watch the log files filtered by Fluentd (td-agent)
+
+    configuration should be this dict
+      watch_dir  [required]: path to the directory to watch
+      target_pattern       : glob pattern for the target files
+      pending_pattern      : glob pattern for checking pending files
+      message_num_threshold: maximum number of messages for each log level
+      message_len_threshold: maximum length for each message
+      pending_threshold    : threshold number of files for checking pending files
 
     The settings of td-agent.conf should be like this.
 
@@ -57,20 +66,25 @@ class LogWatcher(Watcher):
     DEFAULT_MESSAGE_LEN_THRESHOLD = 1024
     DEFAULT_PENDING_THRESHOLD = 3
 
-    def __init__(self, config, print_only, logger):
-        # TODO: check setting
-        watch_dir = config['watch_dir']
-        target_pattern = os.path.join(watch_dir, config.get('target_pattern') or self.DEFAULT_TARGET_PATTERN)
-        pending_pattern = os.path.join(watch_dir, config.get('pending_pattern') or self.DEFAULT_PENDING_PATTERN)
+    def __init__(self, alert_setting, print_only, logger):
+        if not isinstance(alert_setting, dict):
+            raise SettingError('LogWatcher settings not a dict: %s' % alert_setting)
+
+        try:
+            watch_dir = alert_setting['watch_dir']
+            tp = os.path.join(watch_dir, alert_setting.get('target_pattern') or self.DEFAULT_TARGET_PATTERN)
+            pp = os.path.join(watch_dir, alert_setting.get('pending_pattern') or self.DEFAULT_PENDING_PATTERN)
+            nt = int(alert_setting.get('message_num_threshold') or self.DEFAULT_MESSAGE_NUM_THRESHOLD)
+            lt = int(alert_setting.get('message_len_threshold') or self.DEFAULT_MESSAGE_LEN_THRESHOLD)
+            pt = int(alert_setting.get('pending_threshold') or self.DEFAULT_PENDING_THRESHOLD)
+        except KeyError as e:
+            raise SettingError('LogWatcher not found config key: %s' % e.message)
+        except Exception as e:
+            raise SettingError('LogWatcher settings syntax error: %s' % e)
 
         super(LogWatcher, self).__init__(
-            watch_dir=watch_dir, target_pattern=target_pattern, pending_pattern=pending_pattern,
-            message_num_threshold=config.get('message_num_threshold') or self.DEFAULT_MESSAGE_NUM_THRESHOLD,
-            message_len_threshold=config.get('message_len_threshold') or self.DEFAULT_MESSAGE_LEN_THRESHOLD,
-            pending_threshold=config.get('pending_threshold') or self.DEFAULT_PENDING_THRESHOLD,
-            print_only=print_only,
-            logger=logger,
-            target_paths=None
+            watch_dir=watch_dir, target_pattern=tp, pending_pattern=pp, message_num_threshold=nt,
+            message_len_threshold=lt, pending_threshold=pt, print_only=print_only, logger=logger, target_paths=None
         )
 
     def watch(self):
@@ -93,6 +107,8 @@ class LogWatcher(Watcher):
 
     def after_success(self):
         """Delete parsed files after the notification."""
+
+        assert (self.target_paths is not None)
 
         for path in self.target_paths:
             if self.print_only:
