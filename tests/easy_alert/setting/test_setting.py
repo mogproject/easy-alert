@@ -163,9 +163,17 @@ class TestSetting(unittest.TestCase):
     def test_load_config_email_notifier(self):
         with self.assertRaises(SettingError) as cm:
             Setting(['process'], 'tests/resources/easy-alert-test-040.yml', False).load_config()
-        self.assertEqual(cm.exception.message, 'Not found EmailNotifier config key: group_id')
+        self.assertEqual(cm.exception.message, 'EmailNotifier not found config key: group_id')
+        with self.assertRaises(SettingError) as cm:
+            Setting(['process'], 'tests/resources/easy-alert-test-041.yml', False).load_config()
+        self.assertEqual(cm.exception.message, 'EmailNotifier settings not a dict: xxx')
 
     def test_load_config_normal(self):
+        watcher = ProcessWatcher([
+            {'name': 'a', 'regexp': '.*', 'error': '=1'},
+            {'name': 'b', 'regexp': '.*', 'error': '<=1'},
+            {'name': 'c', 'regexp': '.*', 'error': '>=1'},
+        ])
         notifier = EmailNotifier(
             {
                 'group_id': 'awesome',
@@ -178,7 +186,7 @@ class TestSetting(unittest.TestCase):
             watcher_types=['process'],
             config_path='tests/resources/easy-alert-test-100.yml',
             print_only=False,
-            watchers=[ProcessWatcher([1, 2, 3])],
+            watchers=[watcher],
             notifiers=[notifier],
         )
         self.assertEqual(Setting(['process'], 'tests/resources/easy-alert-test-100.yml', False).load_config(),

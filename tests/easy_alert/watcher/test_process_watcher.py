@@ -1,5 +1,6 @@
 import unittest
 import logging
+import re
 from easy_alert.watcher.process_watcher import ProcessReader, ProcessCounter, ProcessWatcher
 from easy_alert.entity.level import Level
 
@@ -136,11 +137,11 @@ class TestProcessCounter(unittest.TestCase):
             11111: (11112, 'your-awesome-app arg1 arg2 "arg 3"'),
             11112: (40, 'your-awesome-app arg1 arg2 "arg 3"'),
         })
-        self.assertEqual(pc.count('.*'), 4)
-        self.assertEqual(pc.count('.*', True), 4)
-        self.assertEqual(pc.count('.*', False), 6)
-        self.assertEqual(pc.count('awesome[-]?app'), 1)
-        self.assertEqual(pc.count('awesome[-]?app', False), 3)
+        self.assertEqual(pc.count(re.compile('.*')), 4)
+        self.assertEqual(pc.count(re.compile('.*'), True), 4)
+        self.assertEqual(pc.count(re.compile('.*'), False), 6)
+        self.assertEqual(pc.count(re.compile('awesome[-]?app')), 1)
+        self.assertEqual(pc.count(re.compile('awesome[-]?app'), False), 3)
 
 
 class TestProcessWatcher(unittest.TestCase):

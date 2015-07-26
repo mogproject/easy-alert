@@ -9,6 +9,8 @@ from easy_alert.setting.setting_error import SettingError
 
 class EmailNotifier(Notifier):
     def __init__(self, notify_setting, print_only, logger):
+        if not isinstance(notify_setting, dict):
+            raise SettingError('EmailNotifier settings not a dict: %s' % notify_setting)
         try:
             super(EmailNotifier, self).__init__(
                 notify_setting['group_id'],
@@ -19,7 +21,7 @@ class EmailNotifier(Notifier):
                 print_only=print_only,
                 logger=logger)
         except KeyError as e:
-            raise SettingError('Not found EmailNotifier config key: %s' % e.message)
+            raise SettingError('EmailNotifier not found config key: %s' % e.message)
 
     def notify(self, alert):
         subject = self.get_subject(alert)

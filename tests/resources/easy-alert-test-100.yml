@@ -1,9 +1,9 @@
 ---
 watchers:
   process:
-    - 1
-    - 2
-    - 3
+    - { name: a, regexp: ".*", error: "=1" }
+    - { name: b, regexp: ".*", error: "<=1" }
+    - { name: c, regexp: ".*", error: ">=1" }
 notifiers:
   email:
     group_id: awesome

@@ -7,6 +7,7 @@ from watcher import Watcher
 from easy_alert.entity import Alert, Level
 from easy_alert.util import CaseClass, get_server_id
 from easy_alert.i18n import *
+from easy_alert.setting.setting_error import SettingError
 
 
 class ProcessReader(object):
@@ -38,14 +39,12 @@ class ProcessCounter(CaseClass):
     """
 
     def __init__(self, process_dict):
-        # TODO: check setting
         super(ProcessCounter, self).__init__(['process_dict', 'cache_distinct', 'cache_aggregated'])
         self.process_dict = process_dict
         self.cache_distinct = None
         self.cache_aggregated = None
 
-    def count(self, regexp, aggregate=True):
-        pattern = re.compile(regexp)
+    def count(self, pattern, aggregate=True):
         d = self._aggregate() if aggregate else self._distinct()
         return sum(x * bool(pattern.search(s)) for s, x in d.items())
 
@@ -78,13 +77,88 @@ class ProcessCounter(CaseClass):
         return self.cache_aggregated
 
 
+class Condition(CaseClass):
+    """
+    Manages comparison operator and the threshold.
+    """
+
+    def __init__(self, condition):
+        super(Condition, self).__init__(['operator', 'threshold'])
+
+        op, threshold = re.match("""([=!<>]+)\s*(\d+)""", condition).groups()
+        t = int(threshold)
+        f = {
+            '=': lambda x: x == int(t),
+            '==': lambda x: x == int(t),
+            '!=': lambda x: x != int(t),
+            '<': lambda x: x < int(t),
+            '<=': lambda x: x <= int(t),
+            '>': lambda x: x > int(t),
+            '>=': lambda x: x >= int(t),
+        }.get(op)
+
+        if f is None:
+            raise SettingError('ProcessWatcher invalid operator: %s' % op)
+        self.operator = op
+        self.threshold = int(threshold)
+        self.check = f
+
+    def __str__(self):
+        return '%s %d' % (self.operator, self.threshold)
+
+
 class ProcessWatcher(Watcher):
     """
     Watch the number of the running processes
+
+    configuration
+      name   [required]: short description for the process
+      regexp [required]: process argument string to be counted in regular expression
+      aggregate        : aggregate forked processes (counted as one) if true (default:true)
+      critical         : check the threshold then alert with critical level
+      error            : check the threshold then alert with error level
+      warn             : check the threshold then alert with warn level
+      info             : check the threshold then alert with info level
+      debug            : check the threshold then alert with debug level
+
+    Any of {critical, error, warn, info, debug} is required.
     """
 
-    def __init__(self, alert_settings, process_reader=ProcessReader()):
-        super(ProcessWatcher, self).__init__(alert_settings=alert_settings, process_reader=process_reader)
+    def __init__(self, alert_setting, process_reader=ProcessReader()):
+        if not isinstance(alert_setting, list):
+            raise SettingError('ProcessWatcher settings not a list: %s' % alert_setting)
+
+        settings = []
+        for s in alert_setting:
+            if not isinstance(s, dict):
+                raise SettingError('ProcessWatcher settings not a dict: %s' % s)
+
+            try:
+                name = s['name']
+                pattern = re.compile(s['regexp'])
+                aggregate = s.get('aggregate', True)
+                conditions = self._parse_conditions(s)
+            except KeyError as e:
+                raise SettingError('ProcessWatcher not found config key: %s' % e.message)
+            except Exception as e:
+                raise SettingError('ProcessWatcher settings syntax error: %s' % e.message)
+
+            settings.append((name, pattern, aggregate, conditions))
+
+        super(ProcessWatcher, self).__init__(settings=settings, process_reader=process_reader)
+
+    def _parse_conditions(self, setting):
+        """
+        :return: sorted list of tuple(Level, Condition) by level (severest first)
+        """
+        ret = []
+        for l in Level.seq:
+            v = setting.get(l.get_keyword())
+            if v:
+                ret.append((l, Condition(v)))
+        if not ret:
+            raise SettingError('ProcessWatcher not found threshold: %s' % setting)
+        return ret
 
     def watch(self):
         """
@@ -94,9 +168,8 @@ class ProcessWatcher(Watcher):
         pc = ProcessCounter(self.process_reader.read())
 
         result = []
-        for s in self.alert_settings:
-            st = self.ProcessStatus(
-                s['name'], pc.count(s['regexp'], s.get('aggregate', True)), self._make_conditions(s))
+        for s in self.settings:
+            st = self.ProcessStatus(s[0], pc.count(s[1], s[2]), s[3])
             if st.level:
                 result.append(st)
 
@@ -107,20 +180,21 @@ class ProcessWatcher(Watcher):
         else:
             return []
 
-    @staticmethod
-    def _make_conditions(alert_setting):
-        """
-        :return: list of tuple(Level, condition string)
-        """
-        ret = [(l, alert_setting.get(l.get_keyword())) for l in Level.seq if l.get_keyword() in alert_setting]
-        return ret
-
     class ProcessStatus(CaseClass):
         def __init__(self, name, count, conditions):
             super(ProcessWatcher.ProcessStatus, self).__init__(['name', 'count', 'level', 'condition'])
             self.name = name
             self.count = count
-            self.level, self.condition = self._check_conditions(count, conditions)
+            self.level = None
+            self.condition = None
+
+            # check condition
+            for level, condition in conditions:
+                # find the first False from the severest level
+                if not condition.check(count):
+                    self.level = level
+                    self.condition = condition
+                    break
 
         def __str__(self):
             count_msg = MSG_PROC_NOT_RUNNING if self.count == 0 else MSG_PROC_RUNNING % {'count': self.count}
@@ -130,24 +204,3 @@ class ProcessWatcher(Watcher):
                 'count': count_msg,
                 'condition': self.condition
             }
-
-        @classmethod
-        def _check_conditions(cls, count, conditions):
-            for level, condition in conditions:
-                # find the first False from the severest level
-                if not cls._parse_condition(condition)(count):
-                    return level, condition
-            return None, None
-
-        @staticmethod
-        def _parse_condition(condition):
-            op, threshold = re.match("""([=!<>]+)\s*(\d+)""", condition).groups()
-            return {
-                "=": lambda x: x == int(threshold),
-                "==": lambda x: x == int(threshold),
-                "!=": lambda x: x != int(threshold),
-                "<": lambda x: x < int(threshold),
-                "<=": lambda x: x <= int(threshold),
-                ">": lambda x: x > int(threshold),
-                ">=": lambda x: x >= int(threshold),
-            }[op]
