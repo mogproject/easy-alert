@@ -105,9 +105,9 @@ class CommandWatcher(Watcher):
             if code != expect_code:
                 return True
         if expect_stdout is not None:
-            if not expect_stdout.match(stdout):
+            if not expect_stdout.findall(stdout):
                 return True
         if expect_stderr is not None:
-            if not expect_stderr.match(stderr):
+            if not expect_stderr.findall(stderr):
                 return True
         return False
