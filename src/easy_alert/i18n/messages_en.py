@@ -28,8 +28,8 @@ MSG_SSH_ALERT_TITLE = u'Detected SSH Connection Error'
 MSG_SSH_ALERT = u'Failed to connect to the following servers using SSH from %(server_id)r.\n\n%(result)s\n\n=='
 
 MSG_CMD_ALERT_FORMAT = u"""[%(level)s] Failed health check: %(name)s
-  actual : {code:%(code)d, stdout:%(stdout)r, stderr:%(stderr)r}
-  expect : {code:%(expect_code)s, stdout:%(expect_stdout)r, stderr:%(expect_stderr)r}"""
+  actual : {code:%(code)d, stdout:%(stdout)s, stderr:%(stderr)s}
+  expect : {code:%(expect_code)d, stdout:%(expect_stdout)s, stderr:%(expect_stderr)s}"""
 MSG_CMD_ALERT_TITLE = u'Detected Health Check Error'
 MSG_CMD_ALERT = u'Detected the following errors on server %(server_id)r.\n\n%(result)s\n\n=='
 
