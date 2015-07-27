@@ -97,7 +97,7 @@ class CommandWatcher(Watcher):
     def _execute_external_command(command):
         p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
         stdout, stderr = p.communicate()
-        return p.returncode, stdout, stderr
+        return p.returncode, stdout.decode('utf-8'), stderr.decode('utf-8')
 
     @staticmethod
     def _should_alert(code, stdout, stderr, expect_code, expect_stdout, expect_stderr):
