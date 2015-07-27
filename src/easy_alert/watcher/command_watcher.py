@@ -19,9 +19,12 @@ class CommandWatcher(Watcher):
       expect_code       : expected exit code number
       expect_stdout     : expected stdout pattern in regexp
       expect_stderr     : expected stderr pattern in regexp
+      max_output_len    : maximum length for each stdout/stderr
 
     Any of {expect_code, expect_stdout, expect_stderr} is required.
     """
+
+    DEFAULT_MAX_OUTPUT_LEN = 1024
 
     def __init__(self, command_setting):
         if not isinstance(command_setting, list):
@@ -36,9 +39,6 @@ class CommandWatcher(Watcher):
                 name = s['name']
                 level_str = s['level']
                 level = [l for l in Level.seq if l.get_keyword() == level_str]
-                if not level:
-                    raise SettingError('CommandWatcher invalid level: %s' % level_str)
-                level = level[0]
                 command = s['command']
                 expect_code = s.get('expect_code')
                 if expect_code:
@@ -49,15 +49,18 @@ class CommandWatcher(Watcher):
                 expect_stderr = s.get('expect_stderr')
                 if expect_stderr:
                     expect_stderr = re.compile(expect_stderr)
+                max_output_len = int(s.get('max_output_len', self.DEFAULT_MAX_OUTPUT_LEN))
             except KeyError as e:
                 raise SettingError('CommandWatcher not found config key: %s' % e)
             except Exception as e:
                 raise SettingError('CommandWatcher settings syntax error: %s' % e)
 
+            if not level:
+                raise SettingError('CommandWatcher invalid level: %s' % level_str)
             if not any([expect_code, expect_stdout, expect_stderr]):
                 raise SettingError('CommandWatcher any of expect_code, expect_stdout or expect_stderr should be set.')
 
-            settings.append((name, level, command, expect_code, expect_stdout, expect_stderr))
+            settings.append((name, level[0], command, expect_code, expect_stdout, expect_stderr, max_output_len))
 
         super(CommandWatcher, self).__init__(settings=settings)
 
@@ -68,16 +71,15 @@ class CommandWatcher(Watcher):
         start_time = datetime.now()
 
         result = []
-        for name, level, command, expect_code, expect_stdout, expect_stderr in self.settings:
+        for name, level, command, expect_code, expect_stdout, expect_stderr, max_output_len in self.settings:
             code, stdout, stderr = self._execute_external_command(command)
             if self._should_alert(code, stdout, stderr, expect_code, expect_stdout, expect_stderr):
                 message = MSG_CMD_ALERT_FORMAT % {
                     'level': level.get_text(),
                     'name': name,
-                    'command': command,
                     'code': code,
-                    'stdout': stdout,
-                    'stderr': stderr,
+                    'stdout': stdout[:max_output_len],
+                    'stderr': stderr[:max_output_len],
                     'expect_code': expect_code,
                     'expect_stdout': expect_stdout.pattern if expect_stdout else None,
                     'expect_stderr': expect_stderr.pattern if expect_stderr else None,
