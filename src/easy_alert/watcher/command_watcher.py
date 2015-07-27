@@ -41,13 +41,13 @@ class CommandWatcher(Watcher):
                 level = [l for l in Level.seq if l.get_keyword() == level_str]
                 command = s['command']
                 expect_code = s.get('expect_code')
-                if expect_code:
+                if expect_code is not None:
                     expect_code = int(expect_code)
                 expect_stdout = s.get('expect_stdout')
-                if expect_stdout:
+                if expect_stdout is not None:
                     expect_stdout = re.compile(expect_stdout)
                 expect_stderr = s.get('expect_stderr')
-                if expect_stderr:
+                if expect_stderr is not None:
                     expect_stderr = re.compile(expect_stderr)
                 max_output_len = int(s.get('max_output_len', self.DEFAULT_MAX_OUTPUT_LEN))
             except KeyError as e:
@@ -57,7 +57,7 @@ class CommandWatcher(Watcher):
 
             if not level:
                 raise SettingError('CommandWatcher invalid level: %s' % level_str)
-            if not any([expect_code, expect_stdout, expect_stderr]):
+            if all([expect_code is None, expect_stdout is None, expect_stderr is None]):
                 raise SettingError('CommandWatcher any of expect_code, expect_stdout or expect_stderr should be set.')
 
             settings.append((name, level[0], command, expect_code, expect_stdout, expect_stderr, max_output_len))

@@ -42,9 +42,15 @@ class TestCommandWatcher(unittest.TestCase):
             {'name': 'n2', 'level': 'error', 'command': 'echo abcdefgh', 'expect_code': 0, 'expect_stdout': 'cdf'},
             {'name': 'n3', 'level': 'warn', 'command': 'echo abcdefgh', 'expect_code': 1, 'expect_stdout': 'cde',
              'max_output_len': 5},
+            {'name': 'n4', 'level': 'warn', 'command': 'echo abcdefgh', 'expect_code': 0},
+            {'name': 'n5', 'level': 'warn', 'command': 'echo abcdefgh', 'expect_stdout': ''},
+            {'name': 'n6', 'level': 'warn', 'command': 'echo abcdefgh', 'expect_stderr': ''},
         ]
         self.assertEqual(CommandWatcher(s).settings, [
             ('n1', Level(logging.WARN), 'echo abcdefgh', 0, re.compile('cde'), None, 1024),
             ('n2', Level(logging.ERROR), 'echo abcdefgh', 0, re.compile('cdf'), None, 1024),
             ('n3', Level(logging.WARN), 'echo abcdefgh', 1, re.compile('cde'), None, 5),
+            ('n4', Level(logging.WARN), 'echo abcdefgh', 0, None, None, 1024),
+            ('n5', Level(logging.WARN), 'echo abcdefgh', None, re.compile(''), None, 1024),
+            ('n6', Level(logging.WARN), 'echo abcdefgh', None, None, re.compile(''), 1024),
         ])
