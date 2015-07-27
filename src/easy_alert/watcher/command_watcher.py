@@ -74,7 +74,6 @@ class CommandWatcher(Watcher):
                 message = MSG_CMD_ALERT_FORMAT % {
                     'level': level.get_text(),
                     'name': name,
-                    'command': command,
                     'code': code,
                     'stdout': stdout,
                     'stderr': stderr,

@@ -15,4 +15,4 @@ class Watcher(CaseClass):
         """abstract method"""
 
     def after_success(self):
-        pass
+        """do nothing in default"""
