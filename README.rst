@@ -2,7 +2,7 @@
 easy-alert
 ==========
 
-Super Simple Process Monitoring Tool.
+Super Simple Server Monitoring Tool.
 
 .. image:: https://badge.fury.io/py/easy-alert.svg
    :target: http://badge.fury.io/py/easy-alert
@@ -29,7 +29,9 @@ Super Simple Process Monitoring Tool.
 Features
 --------
 
-* Monitors the number of the running processes, then send notifications.
+* Check verious status, then send notifications.
+
+.. image:: https://raw.githubusercontent.com/mogproject/easy-alert/master/img/overview.png
 
 ------------
 Dependencies
