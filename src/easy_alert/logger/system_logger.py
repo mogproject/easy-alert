@@ -10,5 +10,6 @@ class SystemLogger(Logger):
         super(SystemLogger, self).__init__('SystemLogger[%s]' % self.name)
 
     def _log(self, priority, message):
-        syslog.openlog(self.name)
+        syslog.openlog(self.name, syslog.LOG_PID)
         syslog.syslog(priority, message)
+        syslog.closelog()
