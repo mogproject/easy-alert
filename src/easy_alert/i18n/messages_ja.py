@@ -28,8 +28,8 @@ MSG_SSH_ALERT_TITLE = u'SSH疎通異常を検知しました'
 MSG_SSH_ALERT = u'サーバ %(server_id)s から、以下のサーバに対する SSH 疎通確認に失敗しました。\n\n%(result)s\n\n以上'
 
 MSG_CMD_ALERT_FORMAT = u"""[%(level)s] %(name)s のヘルスチェックに失敗
-  actual : {code:%(code)d, stdout:%(stdout)s, stderr:%(stderr)s}
-  expect : {code:%(expect_code)d, stdout:%(expect_stdout)s, stderr:%(expect_stderr)s}"""
+  actual: {code:%(code)d, stdout:%(stdout)s, stderr:%(stderr)s}
+  expect: {code:%(expect_code)d, stdout:%(expect_stdout)s, stderr:%(expect_stderr)s}"""
 MSG_CMD_ALERT_TITLE = u'ヘルスチェック異常を検知しました'
 MSG_CMD_ALERT = u'サーバ %(server_id)s にて、以下のヘルスチェック異常を検知しました。\n\n%(result)s\n\n以上'
 
