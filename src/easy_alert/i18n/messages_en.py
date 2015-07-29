@@ -10,7 +10,7 @@ MSG_CRITICAL = u"CRITICAL"
 
 MSG_PROC_NOT_RUNNING = u'not running'
 MSG_PROC_RUNNING = u'%(count)d process(es) are running'
-MSG_PROC_STATUS_FORMAT = u'[%(level)s] %(name)s: %(count)s (not "%(condition)s")'
+MSG_PROC_STATUS_FORMAT = u'[%(level)s] %(name)s: %(count)s (not %(condition)s)'
 MSG_PROC_ALERT_TITLE = u'Detected Process Abnormality'
 MSG_PROC_ALERT = u'Detected the following process abnormality on server %(server_id)r.\n\n%(result)s\n\n=='
 

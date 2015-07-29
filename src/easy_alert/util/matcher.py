@@ -31,4 +31,4 @@ class Matcher(CaseClass):
         self.check = f
 
     def __str__(self):
-        return '"%s %s"' % (self.operator, self.threshold)
+        return '"%s %d"' % (self.operator, self.threshold)
