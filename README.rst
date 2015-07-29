@@ -31,7 +31,7 @@ Features
 
 * Check various status, then send notifications.
 
-.. image:: https://raw.githubusercontent.com/mogproject/easy-alert/master/img/overview.png
+.. image:: https://raw.githubusercontent.com/mogproject/easy-alert/master/docs/img/overview.png
 
 ------------
 Dependencies
