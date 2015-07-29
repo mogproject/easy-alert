@@ -1,8 +1,15 @@
-import unittest
 import logging
+import sys
 import re
 from easy_alert.watcher.process_watcher import ProcessReader, ProcessCounter, ProcessWatcher
+from easy_alert.setting.setting_error import SettingError
 from easy_alert.entity.level import Level
+from easy_alert.util import Matcher
+
+if sys.version_info < (2, 7):
+    import unittest2 as unittest
+else:
+    import unittest
 
 
 class MockProcessReader(ProcessReader):
@@ -145,6 +152,45 @@ class TestProcessCounter(unittest.TestCase):
 
 
 class TestProcessWatcher(unittest.TestCase):
+    def test_init_error(self):
+        def assert_err(setting, expected):
+            with self.assertRaises(SettingError) as cm:
+                ProcessWatcher(setting)
+            self.assertEqual(cm.exception.args[0], expected)
+
+        assert_err('xxx', 'ProcessWatcher settings not a list: xxx')
+        assert_err({}, 'ProcessWatcher settings not a list: {}')
+        assert_err([[]], 'ProcessWatcher settings not a dict: []')
+        assert_err([{}], "ProcessWatcher not found config key: 'name'")
+        assert_err([{'name': 'name'}], "ProcessWatcher not found config key: 'regexp'")
+        assert_err([{'name': 'name', 'regexp': '['}],
+                   "ProcessWatcher settings syntax error: unexpected end of regular expression")
+        assert_err([{'name': 'name', 'regexp': '.*'}],
+                   "ProcessWatcher not found threshold: {'regexp': '.*', 'name': 'name'}")
+        assert_err([{'name': 'name', 'regexp': '.*', 'aggregate': 'a'}],
+                   "ProcessWatcher value should be bool: a")
+        assert_err([{'name': 'name', 'regexp': '.*', 'critical': '>'}],
+                   "ProcessWatcher settings syntax error: Invalid matcher string: >")
+        assert_err([{'name': 'name', 'regexp': '.*', 'debug': '===123'}],
+                   "ProcessWatcher settings syntax error: Invalid matcher string: ===123")
+
+    def test_init_normal(self):
+        s = [
+            {'name': 'n1', 'regexp': '.*', 'error': '==    1 '},
+            {'name': 'n2', 'regexp': '.*', 'aggregate': False,
+             'critical': '>10', 'error': '>=8', 'warn': '==6', 'info': '<=4', 'debug': '<2'},
+        ]
+        self.assertEqual(ProcessWatcher(s).settings, [
+            ('n1', re.compile('.*'), True, [(Level(logging.ERROR), Matcher('== 1'))]),
+            ('n2', re.compile('.*'), False, [
+                (Level(logging.CRITICAL), Matcher('> 10')),
+                (Level(logging.ERROR), Matcher('>= 8')),
+                (Level(logging.WARN), Matcher('= 6')),
+                (Level(logging.INFO), Matcher('<= 4')),
+                (Level(logging.DEBUG), Matcher('< 2')),
+                ])
+        ])
+
     def test_watch(self):
         process_reader = MockProcessReader("""  PID  PPID ARGS
     1     0 /sbin/launchd

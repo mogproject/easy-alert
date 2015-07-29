@@ -5,7 +5,7 @@ from datetime import datetime
 
 from watcher import Watcher
 from easy_alert.entity import Alert, Level
-from easy_alert.util import CaseClass, get_server_id, Matcher
+from easy_alert.util import CaseClass, get_server_id, Matcher, apply_option
 from easy_alert.i18n import *
 from easy_alert.setting.setting_error import SettingError
 
@@ -106,8 +106,10 @@ class ProcessWatcher(Watcher):
             try:
                 name = s['name']
                 pattern = re.compile(s['regexp'])
-                aggregate = s.get('aggregate', True)
+                aggregate = self.__verify_bool(s.get('aggregate', True))
                 conditions = self._parse_conditions(s)
+            except SettingError as e:
+                raise e
             except KeyError as e:
                 raise SettingError('ProcessWatcher not found config key: %s' % e)
             except Exception as e:
@@ -130,6 +132,12 @@ class ProcessWatcher(Watcher):
         if not ret:
             raise SettingError('ProcessWatcher not found threshold: %s' % setting)
         return ret
+
+    @staticmethod
+    def __verify_bool(x):
+        if not isinstance(x, bool):
+            raise SettingError('ProcessWatcher value should be bool: %s' % x)
+        return x
 
     def watch(self):
         """
