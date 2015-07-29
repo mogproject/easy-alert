@@ -29,7 +29,7 @@ Super Simple Server Monitoring Tool.
 Features
 --------
 
-* Check verious status, then send notifications.
+* Check various status, then send notifications.
 
 .. image:: https://raw.githubusercontent.com/mogproject/easy-alert/master/img/overview.png
 

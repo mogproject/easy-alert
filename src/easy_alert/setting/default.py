@@ -1,4 +1,4 @@
-from easy_alert.watcher import ProcessWatcher, LogWatcher, SSHWatcher, CommandWatcher
+from easy_alert.watcher import ProcessWatcher, LogWatcher, SSHWatcher, CommandWatcher, HTTPWatcher
 from easy_alert.notifier import EmailNotifier
 
 # dict of the watcher and its factory
@@ -7,6 +7,7 @@ WATCHER_FACTORIES = {
     'process': lambda conf, print_only, logger: ProcessWatcher(conf),
     'ssh': lambda conf, print_only, logger: SSHWatcher(conf),
     'command': lambda conf, print_only, logger: CommandWatcher(conf),
+    'http': lambda conf, print_only, logger: HTTPWatcher(conf),
 }
 
 # dict of the notifier and its factory

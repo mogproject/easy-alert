@@ -17,11 +17,11 @@ class CommandWatcher(Watcher):
       level   [required]: alert level (should be in {critical, error, warn, info, debug})
       command [required]: command line string
       expect_code       : expected exit code number
-      expect_stdout     : expected stdout pattern in regexp
-      expect_stderr     : expected stderr pattern in regexp
-      max_output_len    : maximum length for each stdout/stderr
+      expect_stdout  [*]: expected stdout pattern in regexp
+      expect_stderr  [*]: expected stderr pattern in regexp
+      max_output_len [*]: maximum length for each stdout/stderr
 
-    Any of {expect_code, expect_stdout, expect_stderr} is required.
+    * Any of {expect_code, expect_stdout, expect_stderr} is required.
     """
 
     DEFAULT_MAX_OUTPUT_LEN = 1024
