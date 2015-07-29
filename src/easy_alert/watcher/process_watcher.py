@@ -5,7 +5,7 @@ from datetime import datetime
 
 from watcher import Watcher
 from easy_alert.entity import Alert, Level
-from easy_alert.util import CaseClass, get_server_id
+from easy_alert.util import CaseClass, get_server_id, Matcher, apply_option
 from easy_alert.i18n import *
 from easy_alert.setting.setting_error import SettingError
 
@@ -77,36 +77,6 @@ class ProcessCounter(CaseClass):
         return self.cache_aggregated
 
 
-class Condition(CaseClass):
-    """
-    Manages comparison operator and the threshold.
-    """
-
-    def __init__(self, condition):
-        super(Condition, self).__init__(['operator', 'threshold'])
-
-        op, threshold = re.match("""([=!<>]+)\s*(\d+)""", condition).groups()
-        t = int(threshold)
-        f = {
-            '=': lambda x: x == int(t),
-            '==': lambda x: x == int(t),
-            '!=': lambda x: x != int(t),
-            '<': lambda x: x < int(t),
-            '<=': lambda x: x <= int(t),
-            '>': lambda x: x > int(t),
-            '>=': lambda x: x >= int(t),
-        }.get(op)
-
-        if f is None:
-            raise SettingError('ProcessWatcher invalid operator: %s' % op)
-        self.operator = op
-        self.threshold = int(threshold)
-        self.check = f
-
-    def __str__(self):
-        return '%s %d' % (self.operator, self.threshold)
-
-
 class ProcessWatcher(Watcher):
     """
     Watch the number of the running processes
@@ -115,13 +85,13 @@ class ProcessWatcher(Watcher):
       name   [required]: short description for the process
       regexp [required]: process argument string to be counted in regular expression
       aggregate        : aggregate forked processes (counted as one) if true (default:true)
-      critical         : check the threshold then alert with critical level
-      error            : check the threshold then alert with error level
-      warn             : check the threshold then alert with warn level
-      info             : check the threshold then alert with info level
-      debug            : check the threshold then alert with debug level
+      critical      [*]: check the threshold then alert with critical level
+      error         [*]: check the threshold then alert with error level
+      warn          [*]: check the threshold then alert with warn level
+      info          [*]: check the threshold then alert with info level
+      debug         [*]: check the threshold then alert with debug level
 
-    Any of {critical, error, warn, info, debug} is required.
+    * At least one of {critical, error, warn, info, debug} is required.
     """
 
     def __init__(self, alert_setting, process_reader=ProcessReader()):
@@ -136,8 +106,10 @@ class ProcessWatcher(Watcher):
             try:
                 name = s['name']
                 pattern = re.compile(s['regexp'])
-                aggregate = s.get('aggregate', True)
+                aggregate = self.__verify_bool(s.get('aggregate', True))
                 conditions = self._parse_conditions(s)
+            except SettingError as e:
+                raise e
             except KeyError as e:
                 raise SettingError('ProcessWatcher not found config key: %s' % e)
             except Exception as e:
@@ -155,11 +127,17 @@ class ProcessWatcher(Watcher):
         ret = []
         for l in Level.seq:
             v = setting.get(l.get_keyword())
-            if v:
-                ret.append((l, Condition(v)))
+            if v is not None:
+                ret.append((l, Matcher(v)))
         if not ret:
             raise SettingError('ProcessWatcher not found threshold: %s' % setting)
         return ret
+
+    @staticmethod
+    def __verify_bool(x):
+        if not isinstance(x, bool):
+            raise SettingError('ProcessWatcher value should be bool: %s' % x)
+        return x
 
     def watch(self):
         """
