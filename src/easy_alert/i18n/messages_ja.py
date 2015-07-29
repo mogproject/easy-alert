@@ -38,6 +38,10 @@ MSG_HTTP_ALERT_FORMAT = u"""[%(level)s] %(name)s のヘルスチェックに失�
   actual : {code:%(code)d, size:%(size)d}
   expect : {code:%(expect_code)d, size:%(expect_size)s, regexp:%(expect_regexp)s}
   message: %(additional_info)s"""
+MSG_HTTP_ALERT_FORMAT_ERR = u"""[%(level)s] %(name)s のヘルスチェックに失敗
+  url    : %(url)s
+  error  : %(error)s
+  message: %(additional_info)s"""
 MSG_HTTP_ALERT_TITLE = u'HTTP疎通異常を検知しました'
 MSG_HTTP_ALERT = u'サーバ %(server_id)s にて、以下のヘルスチェック異常を検知しました。\n\n%(result)s\n\n以上'
 

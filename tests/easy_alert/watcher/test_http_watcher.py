@@ -56,12 +56,12 @@ class TestCommandWatcher(unittest.TestCase):
             {'name': 'n8', 'level': 'warn', 'url': 'localhost', 'expect_regexp': ''},
         ]
         self.assertEqual(HTTPWatcher(s).settings, [
-            ('n1', Level(logging.DEBUG), 'example.com', 10, 0, '', 200, None, None),
-            ('n2', Level(logging.DEBUG), 'http://example.com', 10, 0, '', 200, None, None),
-            ('n3', Level(logging.DEBUG), 'https://example.com', 10, 0, '', 200, None, None),
-            ('n4', Level(logging.DEBUG), 'HTTP://EXAMPLE.COM', 10, 0, '', 200, None, None),
+            ('n1', Level(logging.DEBUG), 'example.com', 10, 2, '', 200, None, None),
+            ('n2', Level(logging.DEBUG), 'http://example.com', 10, 2, '', 200, None, None),
+            ('n3', Level(logging.DEBUG), 'https://example.com', 10, 2, '', 200, None, None),
+            ('n4', Level(logging.DEBUG), 'HTTP://EXAMPLE.COM', 10, 2, '', 200, None, None),
             ('n5', Level(logging.CRITICAL), 'localhost', 60, 5, 'abc', 200, Matcher('>=100'), re.compile('.*')),
-            ('n6', Level(logging.WARN), 'localhost', 10, 0, '', 0, None, None),
-            ('n7', Level(logging.WARN), 'localhost', 10, 0, '', None, Matcher('=0'), None),
-            ('n8', Level(logging.WARN), 'localhost', 10, 0, '', None, None, re.compile('')),
+            ('n6', Level(logging.WARN), 'localhost', 10, 2, '', 0, None, None),
+            ('n7', Level(logging.WARN), 'localhost', 10, 2, '', None, Matcher('=0'), None),
+            ('n8', Level(logging.WARN), 'localhost', 10, 2, '', None, None, re.compile('')),
         ])

@@ -1,3 +1,6 @@
+import time
+
+
 def apply_option(f, arg):
     """
     Apply function if the arg is not None
@@ -8,19 +11,23 @@ def apply_option(f, arg):
     return arg if arg is None else f(arg)
 
 
-def with_retry(count):
+def with_retry(count, interval=1):
     """
     Retryable function execution
     :param count: retry limit
+    :param interval: retry interval in sec
     :return:
     """
-    def f(thunk, c=count):
+
+    def f(thunk, c=count, it=interval):
         while True:
             try:
                 return thunk()
             except Exception as e:
                 if c > 0:
                     c -= 1
+                    time.sleep(it)
                 else:
                     raise e
+
     return f

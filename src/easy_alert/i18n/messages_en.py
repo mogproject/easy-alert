@@ -38,7 +38,11 @@ MSG_HTTP_ALERT_FORMAT = u"""[%(level)s] Failed health check: %(name)s
   actual : {code:%(code)d, size:%(size)d}
   expect : {code:%(expect_code)d, size:%(expect_size)s, regexp:%(expect_regexp)s}
   message: %(additional_info)s"""
+MSG_HTTP_ALERT_FORMAT_ERR = u"""[%(level)s] Failed health check: %(name)s
+  url    : %(url)s
+  error  : %(error)s
+  message: %(additional_info)s"""
 MSG_HTTP_ALERT_TITLE = u'Detected HTTP Connection Error'
 MSG_HTTP_ALERT = u'Detected the following errors on server %(server_id)r.\n\n%(result)s\n\n=='
 
-MSG_SUBJECT_FORMAT = u'【%(level)s】[%(group_id)s:%(server_id)s] %(title)s (%(start_time)s)'
+MSG_SUBJECT_FORMAT = u'[%(level)s] [%(group_id)s:%(server_id)s] %(title)s (%(start_time)s)'

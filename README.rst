@@ -39,7 +39,8 @@ Dependencies
 
 * Python >= 2.6
 * pyyaml
-* /bin/ps
+* paramiko (for ssh watcher)
+* /bin/ps (for process watcher)
 
 ------------
 Installation

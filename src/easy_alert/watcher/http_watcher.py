@@ -18,7 +18,7 @@ class HTTPWatcher(Watcher):
       level   [required]: alert level (should be in {critical, error, warn, info, debug})
       url     [required]: url string (scheme should be http or https)
       timeout           : connection timeout in second (default:10)
-      retry             : max count to retry (default:0)
+      retry             : max count to retry (default:2)
       additional_info   : additional information string (default:empty string)
       expect_code    [*]: expected status code of the response
       expect_size    [*]: expected data size in matcher format (e.g. '=123', '< 123', '>=123')
@@ -27,6 +27,7 @@ class HTTPWatcher(Watcher):
     * Any of {expect_code, expect_size, expect_text} is required.
     """
     DEFAULT_TIMEOUT = 10
+    DEFAULT_RETRY = 2
 
     def __init__(self, http_setting):
         if not isinstance(http_setting, list):
@@ -42,7 +43,7 @@ class HTTPWatcher(Watcher):
                 level = self.__get_level(s['level'])
                 url = s['url']
                 timeout = int(s.get('timeout', self.DEFAULT_TIMEOUT))
-                retry = int(s.get('retry', 0))
+                retry = int(s.get('retry', self.DEFAULT_RETRY))
                 additional_info = s.get('additional_info', '')
                 expect_code = apply_option(int, s.get('expect_code'))
                 expect_size = apply_option(Matcher, s.get('expect_size'))
@@ -104,17 +105,27 @@ class HTTPWatcher(Watcher):
 
         result = []
         for name, level, url, timeout, retry, additional_info, expect_code, expect_size, expect_regexp in self.settings:
-            code, data = with_retry(retry)(lambda: self._connect_url(url, timeout))
-            if self._should_alert(code, data, expect_code, expect_size, expect_regexp):
-                message = MSG_HTTP_ALERT_FORMAT % {
+            try:
+                code, data = with_retry(retry)(lambda: self._connect_url(url, timeout))
+                if self._should_alert(code, data, expect_code, expect_size, expect_regexp):
+                    message = MSG_HTTP_ALERT_FORMAT % {
+                        'level': level.get_text(),
+                        'name': name,
+                        'url': url,
+                        'code': code,
+                        'size': len(data),
+                        'expect_code': expect_code,
+                        'expect_size': expect_size,
+                        'expect_regexp': expect_regexp.pattern if expect_regexp else None,
+                        'additional_info': additional_info,
+                    }
+                    result.append((level, message))
+            except Exception as e:
+                message = MSG_HTTP_ALERT_FORMAT_ERR % {
                     'level': level.get_text(),
                     'name': name,
                     'url': url,
-                    'code': code,
-                    'size': len(data),
-                    'expect_code': expect_code,
-                    'expect_size': expect_size,
-                    'expect_regexp': expect_regexp.pattern if expect_regexp else None,
+                    'error': '%s: %s' % (e.__class__.__name__,  e),
                     'additional_info': additional_info,
                 }
                 result.append((level, message))
