@@ -14,7 +14,7 @@ def get_parser():
     )
     parser.add_option(
         '--check', action='store_true', dest='print_only', default=False,
-        help='print process information instead of sending notifications'
+        help='print alerts instead of sending notifications'
     )
 
     return parser
