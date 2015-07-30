@@ -117,9 +117,16 @@ class TestLogWatcher(unittest.TestCase):
         assert_err(s5, "LogWatcher parse error: KeyError: 'message': "
                        "file=tests/resources/log_watcher/err.20150801_1234_5.log, "
                        "line=2015-08-01T12:34:56.789\tmonitor.syslog.warn\t{}")
-        assert_err(s6, 'LogWatcher parse error: ValueError: Expecting object: line 1 column 1 (char 0): '
-                       'file=tests/resources/log_watcher/err.20150801_1234_6.log, '
-                       'line=2015-08-01T12:34:56.789\tmonitor.syslog.warn\t[')
+        with self.assertRaises(Exception) as cm:
+            LogWatcher(s6, True).watch()
+        self.assertIn(cm.exception.args[0], [
+            'LogWatcher parse error: ValueError: Expecting object: line 1 column 1 (char 0): '
+            'file=tests/resources/log_watcher/err.20150801_1234_6.log, '
+            'line=2015-08-01T12:34:56.789\tmonitor.syslog.warn\t[',
+            'LogWatcher parse error: ValueError: Expecting object: line 1 column 1 (char 1): '
+            'file=tests/resources/log_watcher/err.20150801_1234_6.log, '
+            'line=2015-08-01T12:34:56.789\tmonitor.syslog.warn\t[',
+        ])
 
     def test_after_success_print_only(self):
         path = 'tests/resources/log_watcher/dummy1.tmp'
