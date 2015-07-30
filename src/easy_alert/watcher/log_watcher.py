@@ -12,6 +12,10 @@ from easy_alert.i18n import *
 from easy_alert.setting.setting_error import SettingError
 
 
+class LogFormatError(Exception):
+    """Class for log format error"""
+
+
 class LogWatcher(Watcher):
     """
     Watch the log files filtered by Fluentd (td-agent)
@@ -58,6 +62,13 @@ class LogWatcher(Watcher):
     <match clear>
       type null
     </match>
+
+    The output from Fluentd should be like this.
+
+    <DATE_TIME><TAB><TAG_ID>.<LEVEL><TAB>{"message":"<MESSAGE>"}
+
+    e.g.
+    2015-08-01T12:34:56.789<TAB>monitor.syslog.warn<TAB>{"message":"Alert message."}
     """
 
     DEFAULT_TARGET_PATTERN = 'alert.????????_????_*.log'
@@ -129,16 +140,24 @@ class LogWatcher(Watcher):
         max_level = Level(WARN)
         for path in paths:
             for line in open(path):
-                tokens = line.split('\t')
-                tag = tokens[1]
-                msg = json.loads(tokens[2].decode('utf-8', 'ignore'))['message']
-                cnt, msgs = d[tag]
-                cnt += 1
-                # trim string
-                msgs += [msg[:self.message_len_threshold]] if cnt <= self.message_num_threshold else []
-                d[tag] = (cnt, msgs)
-                if max_level == Level(WARN) and tag.endswith('.error'):
-                    max_level = Level(ERROR)
+                try:
+                    tokens = line.split('\t')
+                    if len(tokens) != 3:
+                        raise LogFormatError('LogWatcher parse error: file=%s, line=%s' % (path, line))
+                    tag = tokens[1]
+                    msg = json.loads(tokens[2].decode('utf-8', 'ignore'))['message']
+                    cnt, msgs = d[tag]
+                    cnt += 1
+                    # trim string
+                    msgs += [msg[:self.message_len_threshold]] if cnt <= self.message_num_threshold else []
+                    d[tag] = (cnt, msgs)
+                    level = Level(tag.split('.')[-1])
+                    max_level = max(max_level, level)
+                except LogFormatError as e:
+                    raise e
+                except Exception as e:
+                    raise LogFormatError('LogWatcher parse error: %s: %s: file=%s, line=%s'
+                                         % (e.__class__.__name__, e, path, line))
         return d, max_level
 
     def _make_result(self, result):

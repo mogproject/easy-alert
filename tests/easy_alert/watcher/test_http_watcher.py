@@ -12,7 +12,7 @@ else:
     import unittest
 
 
-class TestCommandWatcher(unittest.TestCase):
+class TestHTTPWatcher(unittest.TestCase):
     def test_init_error(self):
         def assert_err(setting, expected):
             with self.assertRaises(SettingError) as cm:

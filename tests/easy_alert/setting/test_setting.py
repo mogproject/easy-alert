@@ -1,27 +1,15 @@
 import sys
-from contextlib import contextmanager
-from StringIO import StringIO
 from easy_alert.setting import Setting, SettingError
 from yaml.scanner import ScannerError
 from easy_alert.watcher import ProcessWatcher, LogWatcher
 from easy_alert.notifier import EmailNotifier
 from easy_alert.logger import SystemLogger, PrintLogger
+from tests.easy_alert.util.util_for_test import captured_output
 
 if sys.version_info < (2, 7):
     import unittest2 as unittest
 else:
     import unittest
-
-
-@contextmanager
-def captured_output():
-    new_out, new_err = StringIO(), StringIO()
-    old_out, old_err = sys.stdout, sys.stderr
-    try:
-        sys.stdout, sys.stderr = new_out, new_err
-        yield sys.stdout, sys.stderr
-    finally:
-        sys.stdout, sys.stderr = old_out, old_err
 
 
 class TestSetting(unittest.TestCase):

@@ -11,6 +11,16 @@ def apply_option(f, arg):
     return arg if arg is None else f(arg)
 
 
+def exists(opt, predicate):
+    """
+    Returns the result of the predicate if the opt is not None, otherwise returns False
+    :param opt: optional value
+    :param predicate: unary function which returns a boolean value
+    :return:
+    """
+    return opt is not None and predicate(opt)
+
+
 def with_retry(count, interval=1):
     """
     Retryable function execution

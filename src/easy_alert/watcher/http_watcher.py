@@ -6,7 +6,7 @@ from watcher import Watcher
 from easy_alert.entity import Alert, Level
 from easy_alert.i18n import *
 from easy_alert.setting.setting_error import SettingError
-from easy_alert.util import Matcher, get_server_id, apply_option, with_retry
+from easy_alert.util import Matcher, get_server_id, apply_option, with_retry, exists
 
 
 class HTTPWatcher(Watcher):
@@ -86,16 +86,11 @@ class HTTPWatcher(Watcher):
 
     @staticmethod
     def _should_alert(code, data, expect_code, expect_size, expect_regexp):
-        if expect_code is not None:
-            if code != expect_code:
-                return True
-        if expect_size is not None:
-            if not expect_size.check(len(data)):
-                return True
-        if expect_regexp is not None:
-            if not expect_regexp.findall(data):
-                return True
-        return False
+        return any([
+            exists(expect_code, lambda x: x != code),
+            exists(expect_size, lambda x: not x.check(len(data))),
+            exists(expect_regexp, lambda x: x.findall(data)),
+        ])
 
     def watch(self):
         """
