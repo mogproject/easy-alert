@@ -5,7 +5,7 @@ from watcher import Watcher
 from easy_alert.entity import Alert, Level
 from easy_alert.i18n import *
 from easy_alert.setting.setting_error import SettingError
-from easy_alert.util import get_server_id
+from easy_alert.util import get_server_id, exists
 
 
 class CommandWatcher(Watcher):
@@ -101,13 +101,8 @@ class CommandWatcher(Watcher):
 
     @staticmethod
     def _should_alert(code, stdout, stderr, expect_code, expect_stdout, expect_stderr):
-        if expect_code is not None:
-            if code != expect_code:
-                return True
-        if expect_stdout is not None:
-            if not expect_stdout.findall(stdout):
-                return True
-        if expect_stderr is not None:
-            if not expect_stderr.findall(stderr):
-                return True
-        return False
+        return any([
+            exists(expect_code, lambda x: x != code),
+            exists(expect_stdout, lambda x: x.findall(stdout)),
+            exists(expect_stderr, lambda x: x.findall(stderr)),
+        ])

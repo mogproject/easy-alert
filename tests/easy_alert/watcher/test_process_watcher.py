@@ -188,7 +188,7 @@ class TestProcessWatcher(unittest.TestCase):
                 (Level(logging.WARN), Matcher('= 6')),
                 (Level(logging.INFO), Matcher('<= 4')),
                 (Level(logging.DEBUG), Matcher('< 2')),
-                ])
+            ])
         ])
 
     def test_watch(self):
@@ -214,3 +214,16 @@ class TestProcessWatcher(unittest.TestCase):
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0].level, Level(logging.ERROR))
         self.assertEqual(len(result[0].message.splitlines()), 7)
+
+    def test_watch_empty(self):
+        process_reader = MockProcessReader("""  PID  PPID ARGS
+    1     0 /sbin/launchd
+   37     1 /usr/sbin/syslogd
+   38     1 /usr/libexec/UserEventAgent (System)""")
+
+        w = ProcessWatcher(
+            [
+                {'name': 'all procs aggregate', 'error': '<=5', 'warn': '<=3', 'regexp': '.*'},
+            ], process_reader)
+
+        self.assertEqual(w.watch(), [])

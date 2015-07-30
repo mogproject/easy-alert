@@ -48,7 +48,7 @@ coverage.xml
 *.pot
 
 # Django stuff:
-*.log
+#*.log
 
 # Sphinx documentation
 docs/_build/
@@ -62,3 +62,7 @@ target/
 
 # Mac
 .DS_Store
+
+# Test resources
+!/tests/resources/*
+

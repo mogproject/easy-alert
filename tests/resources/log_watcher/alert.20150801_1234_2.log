@@ -1,0 +1,3 @@
+2015-08-01T12:34:56.789	monitor.syslog.warn	{"message":"Alert message 1."}
+2015-08-01T12:34:56.789	monitor.syslog.warn	{"message":"Alert message 2."}
+2015-08-01T12:34:56.789	monitor.syslog.warn	{"message":"Alert message 3."}
