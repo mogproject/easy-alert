@@ -103,6 +103,6 @@ class CommandWatcher(Watcher):
     def _should_alert(code, stdout, stderr, expect_code, expect_stdout, expect_stderr):
         return any([
             exists(expect_code, lambda x: x != code),
-            exists(expect_stdout, lambda x: x.findall(stdout)),
-            exists(expect_stderr, lambda x: x.findall(stderr)),
+            exists(expect_stdout, lambda x: not x.findall(stdout)),
+            exists(expect_stderr, lambda x: not x.findall(stderr)),
         ])
