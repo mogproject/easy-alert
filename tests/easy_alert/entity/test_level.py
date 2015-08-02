@@ -28,6 +28,7 @@ class TestLevel(unittest.TestCase):
         self.assertEqual(Level(logging.CRITICAL).get_keyword(), 'critical')
 
     def test_cmp(self):
+        self.assertTrue(Level('warn') < 20)
         self.assertTrue(Level('warn') < Level('error'))
         self.assertTrue(Level('debug') <= Level('debug'))
         self.assertTrue(Level('info') == Level(20))

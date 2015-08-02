@@ -1,5 +1,6 @@
 import sys
-from easy_alert.setting import Setting, SettingError
+from easy_alert.setting import SettingError
+from easy_alert.setting.setting import Setting
 from yaml.scanner import ScannerError
 from easy_alert.watcher import ProcessWatcher, LogWatcher
 from easy_alert.notifier import EmailNotifier
