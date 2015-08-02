@@ -54,3 +54,91 @@ class TestCommandWatcher(unittest.TestCase):
             ('n5', Level(logging.WARN), 'echo abcdefgh', None, re.compile(''), None, 1024),
             ('n6', Level(logging.WARN), 'echo abcdefgh', None, None, re.compile(''), 1024),
         ])
+
+    def test_watch(self):
+        # Note: use external 'echo' command
+        r1 = CommandWatcher([{
+            'name': 'n1',
+            'level': 'warn',
+            'command': 'echo abc',
+            'expect_code': 0,
+            'expect_stdout': 'abc',
+            'expect_stderr': '',
+        }]).watch()
+        r2 = CommandWatcher([{
+            'name': 'n2',
+            'level': 'warn',
+            'command': 'echo abc',
+            'expect_code': 0,
+        }]).watch()
+        r3 = CommandWatcher([{
+            'name': 'n3',
+            'level': 'warn',
+            'command': 'echo abc',
+            'expect_stdout': 'abc',
+        }]).watch()
+        r4 = CommandWatcher([{
+            'name': 'n4',
+            'level': 'warn',
+            'command': 'echo abc',
+            'expect_stderr': '',
+        }]).watch()
+        r5 = CommandWatcher([{
+            'name': 'n5',
+            'level': 'warn',
+            'command': 'echo',
+            'expect_code': 1,
+        }]).watch()
+        r6 = CommandWatcher([{
+            'name': 'n6',
+            'level': 'warn',
+            'command': 'echo',
+            'expect_stdout': 'abc',
+        }]).watch()
+        r7 = CommandWatcher([{
+            'name': 'n7',
+            'level': 'warn',
+            'command': 'echo',
+            'expect_stderr': 'abc',
+        }]).watch()
+        r8 = CommandWatcher([{
+            'name': 'n8',
+            'level': 'warn',
+            'command': 'echo',
+            'expect_code': '1',
+            'expect_stdout': 'abc',
+            'expect_stderr': 'abc',
+        }]).watch()
+
+        self.assertEqual(r1, [])
+        self.assertEqual(r2, [])
+        self.assertEqual(r3, [])
+        self.assertEqual(r4, [])
+
+        self.assertEqual(len(r5), 1)
+        self.assertEqual(r5[0].level, Level(logging.WARN))
+        m = r5[0].message.splitlines()
+        self.assertIn('  actual: {code:0, stdout:', m)
+        self.assertIn(', stderr:}', m)
+        self.assertIn('  expect: {code:1, stdout:None, stderr:None}', m)
+
+        self.assertEqual(len(r6), 1)
+        self.assertEqual(r6[0].level, Level(logging.WARN))
+        m = r6[0].message.splitlines()
+        self.assertIn('  actual: {code:0, stdout:', m)
+        self.assertIn(', stderr:}', m)
+        self.assertIn('  expect: {code:None, stdout:abc, stderr:None}', m)
+
+        self.assertEqual(len(r7), 1)
+        self.assertEqual(r7[0].level, Level(logging.WARN))
+        m = r7[0].message.splitlines()
+        self.assertIn('  actual: {code:0, stdout:', m)
+        self.assertIn(', stderr:}', m)
+        self.assertIn('  expect: {code:None, stdout:None, stderr:abc}', m)
+
+        self.assertEqual(len(r8), 1)
+        self.assertEqual(r8[0].level, Level(logging.WARN))
+        m = r8[0].message.splitlines()
+        self.assertIn('  actual: {code:0, stdout:', m)
+        self.assertIn(', stderr:}', m)
+        self.assertIn('  expect: {code:1, stdout:abc, stderr:abc}', m)

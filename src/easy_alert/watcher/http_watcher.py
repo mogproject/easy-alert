@@ -89,7 +89,7 @@ class HTTPWatcher(Watcher):
         return any([
             exists(expect_code, lambda x: x != code),
             exists(expect_size, lambda x: not x.check(len(data))),
-            exists(expect_regexp, lambda x: x.findall(data)),
+            exists(expect_regexp, lambda x: not x.findall(data)),
         ])
 
     def watch(self):
