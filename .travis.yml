@@ -13,3 +13,8 @@ script:
 after_success:
   - coveralls
 
+env:
+  matrix:
+    - LANG=ja_JP.utf8
+    - LANG=C
+

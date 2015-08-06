@@ -1,5 +1,5 @@
 import sys
-from setting import Setting
+from setting.setting import Setting
 
 
 def main():
