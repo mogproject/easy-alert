@@ -8,6 +8,8 @@ from easy_alert.setting.setting_error import SettingError
 
 
 class EmailNotifier(Notifier):
+    COMMASPACE = ', '
+
     def __init__(self, notify_setting, print_only, logger):
         if not isinstance(notify_setting, dict):
             raise SettingError('EmailNotifier settings not a dict: %s' % notify_setting)
@@ -15,7 +17,7 @@ class EmailNotifier(Notifier):
             super(EmailNotifier, self).__init__(
                 notify_setting['group_id'],
                 from_address=notify_setting['from_address'],
-                to_address_list=notify_setting['to_address_list'],
+                to_address_list=[s.strip() for s in notify_setting['to_address_list'].split(',')],
                 smtp_server=notify_setting['smtp_server'],
                 smtp_port=notify_setting['smtp_port'],
                 print_only=print_only,
@@ -31,7 +33,7 @@ class EmailNotifier(Notifier):
             self.logger.info('Would send a message:')
             self.logger.info('Subject: %s' % subject)
             self.logger.info('From: %s' % self.from_address)
-            self.logger.info('To: %s' % self.to_address_list)
+            self.logger.info('To: %s' % self.COMMASPACE.join(self.to_address_list))
             self.logger.info('Body:')
             for line in body.split('\n'):
                 self.logger.info(line)
@@ -42,15 +44,15 @@ class EmailNotifier(Notifier):
                 s.sendmail(self.from_address, self.to_address_list, msg.as_string())
             finally:
                 s.close()
-            self.logger.info('Sent mail to %s.' % self.to_address_list)
+            self.logger.info('Sent mail to %s.' % self.COMMASPACE.join(self.to_address_list))
 
-    @staticmethod
-    def __create_message(from_addr, to_addr_list, subject, body, encoding=EMAIL_ENCODING):
+    @classmethod
+    def __create_message(cls, from_addr, to_addr_list, subject, body, encoding=EMAIL_ENCODING):
         """create MIMEText object"""
 
         msg = MIMEText(body.encode(encoding, 'ignore'), 'plain', encoding)
         msg['Subject'] = Header(subject, charset=encoding, header_name='Subject')
         msg['From'] = from_addr
-        msg['To'] = to_addr_list
+        msg['To'] = cls.COMMASPACE.join(to_addr_list)
         msg['Date'] = formatdate(localtime=True)
         return msg
