@@ -29,7 +29,7 @@ Super Simple Server Monitoring Tool.
 Features
 --------
 
-* Check various status, then send notifications.
+* Check various types of status, and then send notifications.
 
 .. image:: https://raw.githubusercontent.com/mogproject/easy-alert/master/docs/img/overview.png
 
@@ -58,9 +58,9 @@ Installation
 | Uninstall   |``pip uninstall easy-alert``           |
 +-------------+---------------------------------------+
 
-* Check installed version: ``easy-alert --version``
+* Check the installed version: ``easy-alert --version``
 
-* Then, write your configuration to the file ``/etc/easy-alert/easy-alert.yml``.
+* Write your configuration to the file ``/etc/easy-alert/easy-alert.yml``.
 
 See an example below.
 
