@@ -44,6 +44,7 @@ class EmailNotifier(Notifier):
             s = smtplib.SMTP(self.smtp_server, self.smtp_port)
             try:
                 if self.smtp_user:
+                    s.starttls()
                     s.login(self.smtp_user, self.smtp_password)
                 s.sendmail(self.from_address, self.to_address_list, msg.as_string())
             finally:
