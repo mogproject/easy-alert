@@ -18,7 +18,7 @@ class LogFormatError(Exception):
 
 class LogWatcher(Watcher):
     """
-    Watch the log files filtered by Fluentd (td-agent)
+    Watch log files filtered by Fluentd (td-agent)
 
     configuration should be this dict
       watch_dir  [required]: path to the directory to watch
@@ -30,7 +30,7 @@ class LogWatcher(Watcher):
 
     The settings of td-agent.conf should be like this.
 
-    # Watch the log file
+    # Watch a log file
     <source>
       type tail
       path /var/log/messages
@@ -47,7 +47,7 @@ class LogWatcher(Watcher):
       rewriterule999 message .* clear
     </match>
 
-    # Write to the temporary alert queue
+    # Write the temporary alert queue
     <match monitor.*.*>
       type file
       path /var/log/easy-alert/alert
