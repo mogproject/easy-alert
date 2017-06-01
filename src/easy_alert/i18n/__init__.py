@@ -7,7 +7,8 @@ def __get_locale():
     lang = os.environ.get('LANG')
     if lang:
         return lang.lower()
-    return locale.getdefaultlocale()[0].lower()
+    loc = locale.getdefaultlocale()[0]
+    return loc.lower() if loc else "C"
 
 
 __locale = __get_locale()
