@@ -41,6 +41,7 @@ Dependencies
 * pyyaml
 * paramiko (for ssh watcher)
 * /bin/ps (for process watcher)
+* /usr/bin/aws (aws-cli for SES notifier)
 
 ------------
 Installation

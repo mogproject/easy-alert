@@ -20,6 +20,8 @@ class EmailNotifier(Notifier):
                 to_address_list=[s.strip() for s in notify_setting['to_address_list'].split(',')],
                 smtp_server=notify_setting['smtp_server'],
                 smtp_port=notify_setting['smtp_port'],
+                smtp_user=notify_setting.get('smtp_user'),
+                smtp_password=notify_setting.get('smtp_password'),
                 print_only=print_only,
                 logger=logger)
         except KeyError as e:
@@ -41,6 +43,8 @@ class EmailNotifier(Notifier):
             msg = self.__create_message(self.from_address, self.to_address_list, subject, body)
             s = smtplib.SMTP(self.smtp_server, self.smtp_port)
             try:
+                if self.smtp_user:
+                    s.login(self.smtp_user, self.smtp_password)
                 s.sendmail(self.from_address, self.to_address_list, msg.as_string())
             finally:
                 s.close()
